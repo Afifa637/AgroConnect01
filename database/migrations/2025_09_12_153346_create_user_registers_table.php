@@ -23,11 +23,11 @@ return new class extends Migration
             $table->string('zip_code',15);
             $table->string('gender',10);
             $table->string('password',255);
-            $table->string('profile_pic',50);
-            $table->string('action',15);
-            $table->string('condition',15);
-            $table->string('NID_1',100);
-            $table->string('NID_2',100);
+            $table->string('profile_pic', 255)->nullable();
+            $table->string('action',15)->nullable();
+            $table->string('condition',15)->nullable();
+            $table->string('NID_1', 255)->nullable();
+            $table->string('NID_2', 255)->nullable();
             $table->timestamps();
         });
     }

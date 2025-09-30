@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('gender',10);
             $table->string('password',255);
             $table->string('profile_pic',70);
-            $table->string('condition',15);
+            $table->string('condition',15)->nullable();
             $table->timestamps();
         });
     }
