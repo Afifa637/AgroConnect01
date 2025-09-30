@@ -22,14 +22,32 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
+    public function store(Request $request): RedirectResponse
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+        'role' => 'required|in:user,farmer,admin',
+    ]);
 
+    $credentials = $request->only('email', 'password');
+    $guard = $request->role; // which guard to use
+
+    if (Auth::guard($guard)->attempt($credentials, $request->boolean('remember'))) {
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return match ($guard) {
+            'admin'  => redirect()->route('a_home'),
+            'farmer' => redirect()->route('f_home'),
+            'user'   => redirect()->route('cust_profile', ['c_username' => Auth::guard('user')->user()->username]),
+            default  => redirect()->route('dashboard'),
+        };
     }
+
+    return back()->withErrors([
+        'email' => 'Invalid login credentials.',
+    ]);
+}
 
     /**
      * Destroy an authenticated session.
