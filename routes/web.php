@@ -28,12 +28,26 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // ================= Home Routes =================
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/services', [HomeController::class, 'services'])->name('services');
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
-Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
-Route::get('/search', [HomeController::class, 'search'])->name('search');
+Route::controller(HomeController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('/about', 'about')->name('about');
+    Route::get('/services', 'services')->name('services');
+    Route::get('/contact', 'contact')->name('contact');
+    Route::get('/gallery', 'gallery')->name('gallery');
+    Route::get('/news_info', 'news_info')->name('news_info');
+
+    // Categories & Crops
+    Route::get('/categories/{crop_type}', 'Categories')->name('Categories');
+    Route::get('/sessions/categories/{crop_type}/{crop_session}', 'Session_Categories')->name('Session_Categories');
+    Route::get('/crop_details/{id}', 'crop_details')->name('crop_details');
+
+    // Search
+    Route::get('/search', 'search')->name('search');
+
+    // Auth Pages
+    Route::get('/login', 'login')->name('login');
+    Route::get('/signup', 'signup')->name('signup');
+});
 
 // ================= Auth Routes =================
 Route::get('/login', [RegisterLoginCheckController::class, 'login'])->name('login'); 
