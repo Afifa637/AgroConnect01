@@ -47,6 +47,8 @@ Route::controller(HomeController::class)->group(function () {
     // Auth Pages
     Route::get('/login', 'login')->name('login');
     Route::get('/signup', 'signup')->name('signup');
+    // Contact form submit
+    Route::post('/contact/submit', 'contactSubmit')->name('contact.submit');
 });
 
 // ================= Auth Routes =================

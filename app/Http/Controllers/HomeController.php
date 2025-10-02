@@ -8,6 +8,7 @@ use App\Models\news_info;
 use App\Models\user_register;
 use App\Models\categories_info;
 use App\Models\crop_import;
+use App\Models\ContactMessage;
 use Carbon\Carbon;
 
 class HomeController extends Controller
@@ -16,7 +17,7 @@ class HomeController extends Controller
     public function index()
     {
         $categories = categories_info::where('categories_status', 1)->get();
-        $latestNews = news_info::latest()->take(5)->get();
+        $latestNews = news_info::latest()->take(3)->get();
         $crops = crop_import::latest()->take(12)->get();
         return view('home.index', compact('categories', 'latestNews', 'crops'));
     }
@@ -45,8 +46,8 @@ class HomeController extends Controller
     // News Page
     public function news_info()
     {
-        $news = news_info::latest()->paginate(10);
-        return view('home.news_info', compact('news'));
+        $newses = news_info::latest()->paginate(6);
+        return view('home.news_info', compact('newses'));
     }
 
     // Categories
@@ -71,13 +72,13 @@ class HomeController extends Controller
     public function crop_details($id)
     {
         $crop = crop_import::findOrFail($id);
-        return view('home.crop_details', compact('crop'));
+        return view('home.crop_details', compact('crop', 'bids_msg'));
     }
 
     // Search
     public function search(Request $request)
     {
-        $query = $request->input('query');
+        $query = $request->input('search');
     
         $s = Crop_import::where('crop_name', 'like', "%$query%")
             ->orWhere('crop_description', 'like', "%$query%")
@@ -97,5 +98,23 @@ class HomeController extends Controller
     public function signup()
     {
         return view('home.signup');
+    }
+
+    // Contact form handler
+    public function contactSubmit(Request $request)
+    {
+        $validated = $request->validate([
+            'name'    => 'required|string|max:191',
+            'email'   => 'required|email|max:191',
+            'phone'   => 'nullable|string|max:40',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        // Save to DB
+        ContactMessage::create($validated);
+
+        // Redirect back to home contact section with success flash
+        return redirect()->to(route('home') . '#contact')
+                         ->with('contact_success', 'Thanks! Your message has been received. We will contact you soon.');
     }
 }
