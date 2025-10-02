@@ -1,9 +1,10 @@
 <?php
 
-require __DIR__.'/auth.php';
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\FarmerController;
+use App\Http\Controllers\FarmCropController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RegisterLoginCheckController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -44,17 +45,14 @@ Route::controller(HomeController::class)->group(function () {
     // Search
     Route::get('/search', 'search')->name('search');
 
-    // Auth Pages
-    Route::get('/login', 'login')->name('login');
-    Route::get('/signup', 'signup')->name('signup');
     // Contact form submit
     Route::post('/contact/submit', 'contactSubmit')->name('contact.submit');
 });
 
 // ================= Auth Routes =================
-Route::get('/login', [RegisterLoginCheckController::class, 'login'])->name('login'); 
+Route::get('/login', [RegisterLoginCheckController::class, 'login'])->name('login');
 Route::post('/login_check', [RegisterLoginCheckController::class, 'login_check'])->name('login_check');
-Route::post('/logout', function(Request $request) {
+Route::post('/logout', function (Request $request) {
     $request->session()->flush();
     return redirect('/login');
 })->name('logout');
@@ -76,9 +74,45 @@ Route::get('/user/dashboard', function () {
 // ================= Farmer Dashboard =================
 Route::get('/farmer/dashboard', function () {
     return view('dashboards.farmer');
-})->middleware(['auth', 'verified','check.session:farmer'])->name('farmer.dashboard');
+})->middleware(['auth', 'verified', 'check.session:farmer'])->name('farmer.dashboard');
 
 // ================= Admin Dashboard =================
 Route::get('/admin/dashboard', function () {
     return view('dashboards.admin');
 })->middleware(['auth', 'verified'])->name('admin.dashboard');
+
+// ================= Farmer Routes =================
+//Route::middleware('f_check')->group(function () {
+    // Farmer Home & Profile
+    Route::controller(FarmerController::class)->group(function () {
+        Route::get('/farmer/home/page', 'f_home')->name('f_home');
+        Route::get('/farmer/search', [FarmerController::class, 'searchCrops'])->name('farmer.search');
+        Route::get('/farmer/bid/messages', 'farm_bid_messages')->name('farm_bid_messages');
+        Route::get('/farmer/confirm/form/{id}', 'confirm_form')->name('confirm_form');
+        Route::get('/confirm/crops', 'confirm_crops')->name('confirm_crops');
+        Route::get('/confirm/delete/{id}', 'delete_confirm')->name('delete_confirm');
+        Route::get('/farmer/profile/{f_username}', 'fa_profile')->name('fa_profile');
+        Route::post('/farmer/profile/update', [FarmerController::class, 'updateProfile'])->name('update_farmer');
+        Route::get('/farmer', 'f_settings')->name('f_settings');
+        Route::get('/customer/details/{username}', 'customer_profile')->name('customer_profile');
+    });
+
+    // Crops
+    Route::controller(FarmCropController::class)->group(function () {
+        Route::get('/farmer/crops/import', 'create')->name('crop_import');
+        Route::post('/farmer/crops/store', 'store')->name('crop_store');
+        Route::get('/farmer/crops/manage', 'index')->name('crop_manage');
+        Route::get('/farmer/crops/edit/{id}', 'edit')->name('crop_edit');
+        Route::put('/farmer/crops/update/{id}', 'update')->name('crop_update');
+        Route::get('/farmer/crops/delete/{id}', 'destroy')->name('crop_delete');
+        Route::get('/farmer/crops/status/{id}', 'toggleStatus')->name('crop_status');
+    });
+
+    // Orders
+    Route::controller(OrderController::class)->group(function () {
+        Route::get('/farmer/orders', 'farmOrderMessages')->name('farmer_orders');
+        Route::get('/customer/orders', 'custOrderMessages')->name('customer_orders');
+        Route::get('/order/payment/{id}', 'paymentForm')->name('order_payment_form');
+        Route::post('/order/manual/payment', 'manuallyPayment')->name('order_manual_payment');
+    });
+//});
