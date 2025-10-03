@@ -29,7 +29,7 @@
                     <h4><i class="fas fa-seedling"></i> Import Your Crop</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{route('add_product_db')}}" enctype="multipart/form-data">
+                    <form method="POST" action="{{route('crop_store')}}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="username" value="{{Session::get('f_username')}}">
 
