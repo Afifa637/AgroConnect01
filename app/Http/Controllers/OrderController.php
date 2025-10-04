@@ -2,91 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\order;
 use App\Models\crop_import;
-use Illuminate\Http\Request;
-use App\Models\Order;
-use App\Models\CropImport;
+use App\Models\pay_confirm_message;
 use App\Models\PayConfirmMessage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
-class OrderController extends Controller
+class orderController extends Controller
 {
     /**
-     * Show payment form
+     * Payment form view
      */
-    public function paymentForm($id)
+    public function payment_form($id)
     {
-        $confirm = PayConfirmMessage::findOrFail($id);
-        return view('buyer.payment_form', compact('confirm'));
+        $confirms = PayConfirmMessage::findOrFail($id);
+        return view('buyer.payment_form', compact('confirms'));
     }
 
     /**
-     * Store manual payment and create an order
+     * Manual payment submission
      */
-    public function manuallyPayment(Request $request)
+    public function manually_payment(Request $request)
     {
         $validated = $request->validate([
-            'f_username'     => 'required|string',
-            'c_username'     => 'required|string',
-            'crop_id'        => 'required|integer|exists:crop_imports,id',
-            'customer_name'  => 'required|string|max:100',
-            'customer_email' => 'required|email',
-            'customer_mobile'=> 'required|string|max:20',
-            'bid_price'      => 'required|numeric',
-            'pay_amount'     => 'required|numeric',
-            'address'        => 'required|string',
-            'division'       => 'required|string',
-            'zip'            => 'required|string|max:10',
-            'transaction_id' => 'required|string',
+            'f_username'      => 'required|string',
+            'c_username'      => 'required|string',
+            'crop_id'         => 'required|integer',
+            'customer_name'   => 'required|string|max:100',
+            'customer_email'  => 'required|email',
+            'customer_mobile' => 'required|string|max:15',
+            'bid_price'       => 'required|numeric|min:1',
+            'pay_amount'      => 'required|numeric|min:1',
+            'address'         => 'required|string|max:255',
+            'division'        => 'required|string|max:100',
+            'zip'             => 'required|string|max:10',
+            'transaction_id'  => 'required|string|max:100',
         ]);
 
-        $order = Order::create([
-            'f_username'     => $validated['f_username'],
-            'c_username'     => $validated['c_username'],
-            'crop_id'        => $validated['crop_id'],
-            'name'           => $validated['customer_name'],
-            'email'          => $validated['customer_email'],
-            'phone'          => $validated['customer_mobile'],
-            'bid_price'      => $validated['bid_price'],
-            'amount'         => $validated['pay_amount'],
-            'status'         => 'Processing',
-            'address'        => $validated['address'],
-            'division'       => $validated['division'],
-            'zip'            => $validated['zip'],
-            'transaction_id' => $validated['transaction_id'],
-            'currency'       => 'BDT',
+        DB::table('orders')->updateOrInsert([
+            'f_username' => $validated['f_username'],
+            'c_username' => $validated['c_username'],
+            'crop_id'    => $validated['crop_id'],
+        ], [
+            'name'          => $validated['customer_name'],
+            'email'         => $validated['customer_email'],
+            'phone'         => $validated['customer_mobile'],
+            'bid_price'     => $validated['bid_price'],
+            'amount'        => $validated['pay_amount'],
+            'status'        => 'Processing',
+            'address'       => $validated['address'],
+            'division'      => $validated['division'],
+            'zip'           => $validated['zip'],
+            'transaction_id'=> $validated['transaction_id'],
+            'currency'      => 'BDT',
         ]);
 
-        // Update crop status
         $crop = crop_import::findOrFail($validated['crop_id']);
-        $crop->condition = "Sold";
+        $crop->condition = 'Sold';
         $crop->save();
 
-        return redirect()->route('cust_order_messages')
-                         ->with('msg', 'Payment information sent successfully');
+        return redirect('/customer/order/messages')
+            ->with('msg', '✅ Payment information sent successfully.');
     }
 
     /**
-     * Farmer order messages
+     * Farmer’s orders
      */
-    public function farmOrderMessages()
+    public function farm_order_messages()
     {
-        $orders = Order::where('f_username', Session::get('f_username'))
-                        ->latest()
-                        ->get();
-
+        $orders = order::where('f_username', Session::get('f_username'))
+                       ->orderByDesc('created_at')
+                       ->get();
         return view('farmer.orders_info', compact('orders'));
     }
 
     /**
-     * Customer order messages
+     * Customer’s orders
      */
-    public function custOrderMessages()
+    public function cust_order_messages()
     {
-        $orders = Order::where('c_username', Session::get('c_username'))
-                        ->latest()
-                        ->get();
-
+        $orders = order::where('c_username', Session::get('c_username'))
+                       ->orderByDesc('created_at')
+                       ->get();
         return view('buyer.orders_info', compact('orders'));
     }
 }

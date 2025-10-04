@@ -62,6 +62,7 @@
 
       <!-- Search -->
       <form action="{{ route('farmer.search') }}" method="GET" class="d-flex ms-3">
+        @csrf
         <input class="form-control me-2" type="search" name="q" placeholder="Search crops...">
         <button class="btn btn-outline-success" type="submit"><i class="fa fa-search"></i></button>
       </form>

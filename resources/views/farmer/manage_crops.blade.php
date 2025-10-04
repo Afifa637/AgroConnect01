@@ -47,13 +47,13 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{route('condition_crop',['id'=>$crop->id])}}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Toggle Status">
+                            <a href="{{route('crop_status',['id'=>$crop->id])}}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Toggle Status">
                                 <i class="fas fa-toggle-on"></i>
                             </a>
-                            <a href="{{route('edit_crop',['id'=>$crop->id])}}" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Edit">
+                            <a href="{{route('crop_edit',['id'=>$crop->id])}}" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{{route('delete_crop',['id'=>$crop->id])}}" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
+                            <a href="{{route('crop_delete',['id'=>$crop->id])}}" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>

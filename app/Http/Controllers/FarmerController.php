@@ -22,19 +22,19 @@ class FarmerController extends Controller
     }
 
     public function searchCrops(Request $request)
-{
-    $query = $request->input('q'); // get search term
-    $username = Session::get('f_username'); // search only in this farmer's crops
+    {
+        $query = $request->input('q'); // get search term
+        $username = Session::get('f_username'); // search only in this farmer's crops
 
-    $crops = Crop_import::where('username', $username)
-        ->where(function($q) use ($query) {
-            $q->where('crop_name', 'like', "%$query%")
-              ->orWhere('crop_type', 'like', "%$query%");
-        })
-        ->get();
+        $crops = Crop_import::where('username', $username)
+            ->where(function ($q) use ($query) {
+                $q->where('crop_name', 'like', "%$query%")
+                    ->orWhere('crop_type', 'like', "%$query%");
+            })
+            ->get();
 
-    return view('farmer.crop_manage', compact('crops', 'query'));
-}
+        return view('farmer.crop_manage', compact('crops', 'query'));
+    }
 
     /**
      * Show farmer bid messages
@@ -93,30 +93,53 @@ class FarmerController extends Controller
         $crops = Crop_import::where('username', $f_username)
             ->where('Action', '!=', 'deleted')
             ->get();
-    
+
         return view('farmer.farmer_profile', compact('user', 'crops'));
-    }    
-
-    // Update profile
-public function updateProfile(Request $request)
-{
-    $user = Farmer_register::where('username', Session::get('f_username'))->firstOrFail();
-
-    $user->username = $request->username;
-    $user->email = $request->email;
-    $user->mobile = $request->mobile;
-
-    if ($request->hasFile('profile_pic')) {
-        $file = $request->file('profile_pic');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('profile_pics'), $filename);
-        $user->profile_pic = 'profile_pics/' . $filename;
     }
 
-    $user->save();
+    // Update profile
+    public function updateProfile(Request $request)
+    {
+        $farmer = Farmer_register::where('username', Session::get('f_username'))->firstOrFail();
 
-    return redirect()->back()->with('msg', 'Profile updated successfully');
-}
+        // Validation
+        $validated = $request->validate([
+            'username'      => 'required|string|max:50|unique:farmer_registers,username,' . $farmer->id,
+            'mobile'        => 'required|digits_between:10,15|unique:farmer_registers,mobile,' . $farmer->id,
+            'dob'           => 'required|date',
+            'division'      => 'required|string|max:100',
+            'zip_code'      => 'nullable|numeric',
+            'address'       => 'nullable|string|max:255',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        // Update model fields
+        $farmer->username = $validated['username'];
+        $farmer->mobile   = $validated['mobile'];
+        $farmer->dob      = $validated['dob'];
+        $farmer->division = $validated['division'];
+        $farmer->zip_code = $request->zip_code;
+        $farmer->address  = $request->address;
+
+        // Handle image upload
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/farmer_profiles'), $imageName);
+            $farmer->profile_pic = 'uploads/farmer_profiles/' . $imageName;
+        }
+
+        $farmer->save();
+        // Sync session data
+        Session::put([
+            'f_username' => $farmer->username,
+            'f_email'    => $farmer->email,
+            'f_mobile'   => $farmer->mobile,
+            'f_profile'  => $farmer->profile_pic,
+        ]);
+
+        return redirect()->route('f_settings')->with('success', 'Profile updated successfully!');
+    }
 
     /**
      * Farmer settings page
@@ -124,50 +147,50 @@ public function updateProfile(Request $request)
     public function f_settings()
     {
         $user = Farmer_register::where('username', Session::get('f_username'))->first();
+
+        if (!$user) {
+            return redirect()->route('f_login')->withErrors(['msg' => 'Please log in first.']);
+        }
+
         return view('farmer.f_settings', compact('user'));
     }
-
     /**
      * NID verification upload
      */
     public function NID_verification(Request $request)
     {
-        $NidImage = $request->file('nid_image');
-        $NidImage2 = $request->file('nid_image2');
-        $currentTime = time();
+        $request->validate([
+            'nid_image'  => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'nid_image2' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-        $imageUrl = null;
-        $imageUrl2 = null;
-
-        if ($NidImage) {
-            $imageName = $currentTime . '.' . $NidImage->getClientOriginalName();
-            $directory = 'public/nid_images/';
-            $imageUrl = $directory . $imageName;
-            $NidImage->move($directory, $imageName);
+        $path = 'uploads/nid_images/';
+        if (!file_exists(public_path($path))) {
+            mkdir(public_path($path), 0777, true);
         }
 
-        if ($NidImage2) {
-            $imageName = $currentTime . '.' . $NidImage2->getClientOriginalName();
-            $directory = 'public/nid_images/';
-            $imageUrl2 = $directory . $imageName;
-            $NidImage2->move($directory, $imageName);
+        $front = $request->file('nid_image');
+        $back  = $request->file('nid_image2');
+        $time  = time();
+
+        $file1 = $time . '_front.' . $front->getClientOriginalExtension();
+        $file2 = $time . '_back.' . $back->getClientOriginalExtension();
+
+        $front->move(public_path($path), $file1);
+        $back->move(public_path($path), $file2);
+
+        $farmer = Farmer_register::where('username', Session::get('f_username'))->first();
+
+        if ($farmer) {
+            $farmer->update([
+                'NID_1' => $path . $file1,
+                'NID_2' => $path . $file2,
+            ]);
+
+            return redirect()->route('f_settings')->with('success', 'NID uploaded successfully!');
         }
 
-        if (Session::has('f_username')) {
-            $regis = Farmer_register::where('username', Session::get('f_username'))->first();
-            $regis->NID_1 = $imageUrl;
-            $regis->NID_2 = $imageUrl2;
-            $regis->save();
-
-            return redirect('/farmer')->with('msg', 'NID upload Successfully');
-        } elseif (Session::has('c_username')) {
-            $regis = User_register::where('username', Session::get('c_username'))->first();
-            $regis->NID_1 = $imageUrl;
-            $regis->NID_2 = $imageUrl2;
-            $regis->save();
-
-            return redirect('/customer')->with('msg', 'NID upload Successfully');
-        }
+        return back()->withErrors(['msg' => 'Farmer session not found.']);
     }
 
     /**

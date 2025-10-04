@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\crop_import;
-use App\Models\CropImport;
+use App\Models\farmer_register;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -23,15 +23,15 @@ class FarmCropController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'username'         => 'required|string',
-            'crop_name'        => 'required|string|max:150',
-            'crop_session'     => 'nullable|string',
-            'crop_type'        => 'nullable|string',
-            'crop_quantity'    => 'required|numeric',
-            'crop_location'    => 'required|string',
-            'bid_rate'         => 'required|numeric',
-            'crop_description' => 'nullable|string',
-            'last_date_bidding'=> 'required|date',
+            'username' => 'required|exists:farmer_registers,username',
+            'crop_name' => 'required|string|max:35',
+            'crop_session' => 'required',
+            'crop_type' => 'required|exists:categories_infos,id',
+            'crop_quantity' => 'required|string|max:25', // string if you allow "50kg"
+            'crop_location' => 'required|string|max:50',
+            'bid_rate' => 'required|numeric|min:1',
+            'crop_description' => 'required|string|max:255',
+            'last_date_bidding' => 'required|date|after_or_equal:today',
             'crop_image'       => 'nullable|image|max:2048',
             'crop_image2'      => 'nullable|image|max:2048',
         ]);
@@ -60,8 +60,8 @@ class FarmCropController extends Controller
     public function index()
     {
         $crops = crop_import::where('username', Session::get('f_username'))
-                            ->where('Action', '!=', "deleted")
-                            ->paginate(9);
+            ->where('Action', '!=', "deleted")
+            ->paginate(9);
 
         return view('farmer.manage_crops', compact('crops'));
     }
@@ -81,13 +81,16 @@ class FarmCropController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'crop_name'        => 'required|string|max:150',
-            'crop_quantity'    => 'required|numeric',
-            'crop_location'    => 'required|string',
-            'bid_rate'         => 'required|numeric',
-            'last_date_bidding'=> 'required|date',
-            'crop_image'       => 'nullable|image|max:2048',
-            'crop_image2'      => 'nullable|image|max:2048',
+            'crop_name'         => 'required|string|max:150',
+            'crop_type'         => 'required|exists:categories_infos,id',
+            'crop_quantity'     => 'required|string|max:25',
+            'crop_location'     => 'required|string|max:100',
+            'bid_rate'          => 'required|numeric|min:1',
+            'crop_description'  => 'required|string|max:255',
+            'last_date_bidding' => 'required|date|after_or_equal:today',
+            'status'            => 'required|in:0,1',
+            'crop_image'        => 'nullable|image|max:2048',
+            'crop_image2'       => 'nullable|image|max:2048',
         ]);
 
         $crop = crop_import::findOrFail($id);
@@ -130,5 +133,21 @@ class FarmCropController extends Controller
         $crop->save();
 
         return redirect()->route('crop_manage')->with('msg', 'Crop deleted successfully');
+    }
+
+    /**
+     * Show all crops in farmer profile view
+     */
+    public function profile()
+    {
+        $username = Session::get('f_username');
+
+        $user = farmer_register::where('username', $username)->first();
+        $crops = crop_import::where('username', $username)
+            ->where('Action', '!=', 'deleted')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('farmer.farmer_profile', compact('crops', 'user'));
     }
 }

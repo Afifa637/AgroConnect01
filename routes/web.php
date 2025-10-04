@@ -5,6 +5,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\FarmCropController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\BuyerController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\BidController;
 use App\Http\Controllers\RegisterLoginCheckController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -65,6 +68,7 @@ Route::post('/registerSave', [RegisterLoginCheckController::class, 'registerSave
 Route::post('/pw_change_link', [RegisterLoginCheckController::class, 'pw_change_link'])->name('pw_change_link');
 Route::get('/pw_change/{role}/{email}', [RegisterLoginCheckController::class, 'pw_change'])->name('pw_change');
 Route::post('/pass_change_save/{role}/{email}', [RegisterLoginCheckController::class, 'pass_change_save'])->name('pass_change_save');
+Route::post('/customer/registerUpdate', [RegisterLoginCheckController::class, 'customerRegisterUpdate'])->name('customerRegisterUpdate');
 
 // ================= Buyer / User Dashboard =================
 Route::get('/user/dashboard', function () {
@@ -83,36 +87,47 @@ Route::get('/admin/dashboard', function () {
 
 // ================= Farmer Routes =================
 //Route::middleware('f_check')->group(function () {
-    // Farmer Home & Profile
-    Route::controller(FarmerController::class)->group(function () {
-        Route::get('/farmer/home/page', 'f_home')->name('f_home');
-        Route::get('/farmer/search', [FarmerController::class, 'searchCrops'])->name('farmer.search');
-        Route::get('/farmer/bid/messages', 'farm_bid_messages')->name('farm_bid_messages');
-        Route::get('/farmer/confirm/form/{id}', 'confirm_form')->name('confirm_form');
-        Route::get('/confirm/crops', 'confirm_crops')->name('confirm_crops');
-        Route::get('/confirm/delete/{id}', 'delete_confirm')->name('delete_confirm');
-        Route::get('/farmer/profile/{f_username}', 'fa_profile')->name('fa_profile');
-        Route::post('/farmer/profile/update', [FarmerController::class, 'updateProfile'])->name('update_farmer');
-        Route::get('/farmer', 'f_settings')->name('f_settings');
-        Route::get('/customer/details/{username}', 'customer_profile')->name('customer_profile');
-    });
+Route::controller(FarmerController::class)->group(function () {
+    Route::get('/farmer/home/page', 'f_home')->name('f_home');
+    Route::get('/farmer/search', 'searchCrops')->name('farmer.search');
+    Route::get('/farmer/bid/messages', 'farm_bid_messages')->name('farm_bid_messages');
 
-    // Crops
-    Route::controller(FarmCropController::class)->group(function () {
-        Route::get('/farmer/crops/import', 'create')->name('crop_import');
-        Route::post('/farmer/crops/store', 'store')->name('crop_store');
-        Route::get('/farmer/crops/manage', 'index')->name('crop_manage');
-        Route::get('/farmer/crops/edit/{id}', 'edit')->name('crop_edit');
-        Route::put('/farmer/crops/update/{id}', 'update')->name('crop_update');
-        Route::get('/farmer/crops/delete/{id}', 'destroy')->name('crop_delete');
-        Route::get('/farmer/crops/status/{id}', 'toggleStatus')->name('crop_status');
-    });
+    // Confirmations
+    Route::get('/farmer/confirm/form/{id}', 'confirm_form')->name('confirm_form');
+    Route::get('/farmer/confirm/crops', 'confirm_crops')->name('confirm_crops');
+    Route::get('/farmer/confirm/delete/{id}', 'delete_confirm')->name('delete_confirm');
 
-    // Orders
-    Route::controller(OrderController::class)->group(function () {
-        Route::get('/farmer/orders', 'farmOrderMessages')->name('farmer_orders');
-        Route::get('/customer/orders', 'custOrderMessages')->name('customer_orders');
-        Route::get('/order/payment/{id}', 'paymentForm')->name('order_payment_form');
-        Route::post('/order/manual/payment', 'manuallyPayment')->name('order_manual_payment');
-    });
+    // Profile & Settings
+    Route::get('/farmer/profile/{f_username}', 'fa_profile')->name('fa_profile');
+    Route::post('/farmer/profile/update', 'updateProfile')->name('update_farmer');
+    Route::get('/farmer', 'f_settings')->name('f_settings');
+
+    // Verification & Logout
+    Route::post('/farmer/nid/verification', 'NID_verification')->name('NID_verification');
+    Route::get('/logout/{name}', 'logout')->name('logout');
+    // Customer info
+    Route::get('/farmer/customer/{username}', 'customer_profile')->name('customer_profile');
+});
+
+// Crops
+Route::controller(FarmCropController::class)->group(function () {
+    Route::get('/farmer/crops/import', 'create')->name('crop_import');
+    Route::post('/farmer/crops/store', 'store')->name('crop_store');
+    Route::get('/farmer/crops/manage', 'index')->name('crop_manage');
+    Route::get('/farmer/crops/edit/{id}', 'edit')->name('crop_edit');
+    Route::put('/farmer/crops/update/{id}', 'update')->name('crop_update');
+    Route::get('/farmer/crops/delete/{id}', 'destroy')->name('crop_delete');
+    Route::get('/farmer/crops/status/{id}', 'toggleStatus')->name('crop_status');
+    Route::get('/farmer/profile', 'profile')->name('farmer_profile');
+
+});
+
+// Orders
+Route::controller(OrderController::class)->group(function () {
+    Route::get('/farmer/orders', 'farmOrderMessages')->name('farmer_orders');
+    Route::get('/customer/orders', 'custOrderMessages')->name('customer_orders');
+    Route::get('/order/payment/{id}', 'paymentForm')->name('order_payment_form');
+    Route::post('/order/manual/payment', 'manuallyPayment')->name('order_manual_payment');
+});
 //});
+

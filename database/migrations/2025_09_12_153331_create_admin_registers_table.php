@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('address',50);
             $table->string('gender',10);
             $table->string('password',255);
-            $table->string('profile_pic',70);
+            $table->string('profile_pic',70)->nullable();
             $table->string('condition',15)->nullable();
             $table->timestamps();
         });
