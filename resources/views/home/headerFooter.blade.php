@@ -7,6 +7,7 @@
     <title>@yield('title', 'AgroConnect')</title>
 
     <!-- Bootstrap 5 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->

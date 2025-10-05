@@ -54,7 +54,14 @@
               <li><a class="dropdown-item" href="{{ route('fa_profile',['f_username'=>Session()->get('f_username')]) }}"><i class="fa fa-user"></i> Profile</a></li>
               <li><a class="dropdown-item" href="{{ route('f_settings') }}"><i class="fa fa-gear"></i> Settings</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="{{ route('logout',['name'=>'f_username']) }}" onclick="return confirm('Logout?');"><i class="fa fa-sign-out-alt"></i> Logout</a></li>
+              <li>
+                <form action="{{ route('farmer.logout') }}" method="POST" onsubmit="return confirm('Logout?');">
+                  @csrf
+                  <button type="submit" class="dropdown-item text-danger">
+                    <i class="fa fa-sign-out-alt"></i> Logout
+                  </button>
+                </form>
+              </li>              
             </ul>
           </li>
         @endif

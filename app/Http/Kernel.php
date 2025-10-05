@@ -45,7 +45,7 @@ class Kernel extends HttpKernel
      * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
-        'check.session' => \App\Http\Middleware\CheckUserSession::class,
+        'check.session' => \App\Http\Middleware\CheckSession::class,
         'f_check' => \App\Http\Middleware\FarmerLoginCheck::class,
     ];
 }

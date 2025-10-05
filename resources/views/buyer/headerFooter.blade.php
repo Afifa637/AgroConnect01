@@ -54,7 +54,14 @@
                                 <li><a class="dropdown-item" href="{{ route('cust_order_messages') }}"><i class="bi bi-bag-check"></i> Orders</a></li>
                                 <li><a class="dropdown-item" href="{{ route('c_settings') }}"><i class="bi bi-gear"></i> Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="{{ route('logout',['name'=>'c_username']) }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                                <li>
+                                    <form action="{{ route('buyer.logout') }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right"></i> Logout
+                                        </button>
+                                    </form>                                    
+                                </li>                                
                             </ul>
                         </div>
                     @endif

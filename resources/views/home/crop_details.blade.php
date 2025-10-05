@@ -1,237 +1,182 @@
 @extends('home.headerFooter')
 
-@section('title')
-Crop details
-@endsection
+@section('title', 'Crop Details')
 
 @section('body')
+@php use Carbon\Carbon; @endphp
 
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h2 class="text-success fw-bold">🌿 Crop Details</h2>
+        @if(Session::get('msg'))
+            <div class="alert alert-success mt-3">{{ Session::get('msg') }}</div>
+        @endif
+    </div>
 
-
-   <h1 class="text-center text-success">{{Session::get('msg')}}</h1>
-    <div class="row mt-5">                                                
-        <!----Image Slider start----------->
+    <div class="row g-4 align-items-center">
+        <!-- Image Slider -->
         <div class="col-lg-6">
-             <div>
-                <div id="carouselExampleIndicators" class="carousel slide my-2" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                        <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                    </ol>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img  height="150" width="300" src='{{url($crop->crop_image)}}'  alt="First slide"/>
-                        </div> 
-                        <div class="carousel-item">
-                            <img  height="300" width="600"  src="{{url($crop->crop_image2)}}" alt="Second slide"/>
-                        </div>
+            <div id="cropCarousel" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="{{ url($crop->crop_image) }}" class="d-block w-100 rounded" alt="Crop Image 1">
                     </div>
-                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
+                    <div class="carousel-item">
+                        <img src="{{ url($crop->crop_image2) }}" class="d-block w-100 rounded" alt="Crop Image 2">
+                    </div>
                 </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#cropCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#cropCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
         </div>
 
-        <!----Image Details start----------->
+        <!-- Crop Info -->
         <div class="col-lg-6">
-            <div>
-                <div class=" font-weight-bold float-center display-5">
-                           <h3>Crop-Name:-- <span class="text-primary">{{$crop->crop_name}}</span></h3>
-                            <!-- <p>Crop-type:--{{$crop->crop_type}}</p> -->
-                            <p>Quantity:--{{$crop->crop_quantity}}</p>
-                            <p>Location:--{{$crop->crop_location}}</p>
-                            <p>Bid Rate:--{{$crop->bid_rate}}TK</p>
-                            <p>Finished Date:--{{$crop->last_date_bidding}}</p>
-                            <p>Condition:--{{$crop->condition}}</p>
-                            <p>Description:--{{$crop->crop_description}}</p>
-                            <small>created_at:--{{$crop->created_at}}</small><br>
-                            <!-- <span>Farmer:---<a href="">{{$crop->username}}</a></span> -->
-                            <p class="mt-3">Farmer:---<button class="btn btn-outline-success" data-toggle="modal" data-target="#farm_details">{{$crop->username}}</button></p>
+            <div class="card border-success shadow-sm rounded-4 p-4">
+                <h3 class="text-primary fw-bold">{{ $crop->crop_name }}</h3>
+                <p><strong>Quantity:</strong> {{ $crop->crop_quantity }}</p>
+                <p><strong>Location:</strong> {{ $crop->crop_location }}</p>
+                <p><strong>Bid Rate:</strong> {{ $crop->bid_rate }} TK</p>
+                <p><strong>Finished Date:</strong> {{ $crop->last_date_bidding }}</p>
+                <p><strong>Condition:</strong> {{ $crop->condition }}</p>
+                <p><strong>Description:</strong> {{ $crop->crop_description }}</p>
+                <small class="text-muted">Posted on: {{ $crop->created_at }}</small>
+
+                <div class="mt-3">
+                    <p><strong>Farmer:</strong>
+                        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#farmerModal">
+                            {{ $crop->username }}
+                        </button>
+                    </p>
                 </div>
-                <div class="">
+
+                <div class="mt-4">
                     @if(Session::get('c_username'))
-                       @if(!Carbon\Carbon::now()->greaterThan($crop->last_date_bidding))
-                     <button class="btn btn-success btn-block" data-toggle="modal" data-target="#BidModal">Bid here</button> 
-                         @else <h4 class="text-danger">Bidding Time Finished</h4>
-                       @endif
+                        @if(!Carbon::now()->greaterThan($crop->last_date_bidding))
+                            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#BidModal">
+                                🌾 Bid Here
+                            </button>
+                        @else
+                            <h5 class="text-danger text-center">Bidding Time Finished</h5>
+                        @endif
                     @else
-
-                        <a class="btn btn-success btn-block" target="_blank" href="{{route('login')}}">Bid here</a>
-
+                        <a class="btn btn-success w-100" target="_blank" href="{{ route('login') }}">Login to Bid</a>
                     @endif
                 </div>
             </div>
+        </div>
+    </div>
 
-    <!----Farmer Details Modal start----------->
-
-      <div class="modal" id="farm_details">
-        <div class="modal-dialog">
-            <div class="modal-content bg-light">
-                <div class="modal-header">
-                    <h3 class="text-center">Farmer Details</h3>
-                    <button class="close text-dark" data-dismiss="modal">&times;</button>
+    <!-- Farmer Details Modal -->
+    <div class="modal fade" id="farmerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-success shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">👩‍🌾 Farmer Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                @php( $details =App\Models\farmer_register::where('username', $crop->username)->first())
+                @php($details = App\Models\farmer_register::where('username', $crop->username)->first())
                 <div class="modal-body">
-                   <table class="table table-bordered  text-center table-hover table-responsive-lg">
-                    
-                    <tr>
-                      <th>USERNAME-</th>
-                      <td>{{$details->username}}</td>
-                    </tr>
-
-                    <tr>
-                       <th>EMAIL-</th>
-                        <td>{{$details->email}}</td>
-                    </tr>
-
-                    <tr>
-                      <th>MOBILE-</th>
-                      <td>{{$details->mobile}}</td>
-                    </tr>
-                       
-                    <tr>
-                       <th>DIVISION-</th>
-                       <td>{{$details->division}}</td>
-                    </tr>
-
-                    <tr>
-                      <th>ADDRESS-</th>
-                      <td>{{$details->address}}</td>
-                    </tr>
-
-                    <tr>
-                        <th>ZIP-CODE-</th>
-                        <td>{{$details->zip_code}}</td>
-                    </tr>
-                        
-                       
-                    <tr>
-                       <th>GENDER-</th>
-                      <td>{{$details->gender}}</td>
-                    </tr>
-                   </table>
+                    <table class="table table-bordered table-striped text-center">
+                        <tr><th>Username</th><td>{{ $details->username }}</td></tr>
+                        <tr><th>Email</th><td>{{ $details->email }}</td></tr>
+                        <tr><th>Mobile</th><td>{{ $details->mobile }}</td></tr>
+                        <tr><th>Division</th><td>{{ $details->division }}</td></tr>
+                        <tr><th>Address</th><td>{{ $details->address }}</td></tr>
+                        <tr><th>Zip Code</th><td>{{ $details->zip_code }}</td></tr>
+                        <tr><th>Gender</th><td>{{ $details->gender }}</td></tr>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-     <!----Farmer Details Modal end----------->
 
-        </div>
-
-    </div>
-
-
-
-    <!----Bidding Modal start----------->
-
-    <div class="modal" id="BidModal">
-        <div class="modal-dialog">
-            <div class="modal-content bg-light">
-                <div class="modal-header">
-                    <h3 class="text-center">Bid Here</h3>
-                    <button class="close text-dark" data-dismiss="modal">&times;</button>
+    <!-- Bidding Modal -->
+    <div class="modal fade" id="BidModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-success shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">🌾 Place Your Bid</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{route('bid_msg_saved')}}" method="post">
+                    <form action="{{ route('bid_msg_saved') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="crop_id" value="{{$crop->id}}" class="form-control">
-                        <input type="hidden" name="crop_name" value="{{$crop->crop_name}}" class="form-control">
-                        <input type="hidden" name="f_username" value="{{$crop->username}}" class="form-control">
-                        <input type="hidden" name="cust_username" value="{{Session::get('c_username')}}" class="form-control">
+                        <input type="hidden" name="crop_id" value="{{ $crop->id }}">
+                        <input type="hidden" name="crop_name" value="{{ $crop->crop_name }}">
+                        <input type="hidden" name="f_username" value="{{ $crop->username }}">
+                        <input type="hidden" name="cust_username" value="{{ Session::get('c_username') }}">
 
-                        <div class="bid">
-                            Bid Rate::---<span class="ml-4">{{$crop->bid_rate}}TK</span>
+                        <div class="mb-2"><strong>Base Bid Rate:</strong> {{ $crop->bid_rate }} TK</div>
+
+                        @php($price = App\Models\Bid_message::where('crop_id', $crop->id)->max('bid_price'))
+                        <div class="mb-3">
+                            <strong>Best Bidder:</strong>
+                            <span class="text-primary">
+                                {{ $price ? $price . ' TK' : 'No bids yet' }}
+                            </span>
                         </div>
 
-                    @php( $price =App\Models\Bid_message::where('crop_id', $crop->id)->max('bid_price'))
-                          
-                        
-                        <div class="bid">
-                            Best Bidder::---
-                            @if($price==null)
-                               <span>Not any bid</span>
-                            @else 
-                            <span class="ml-4">{{$price}}TK</span>
-                            @endif
-
+                        <div class="mb-3">
+                            <label class="form-label">Your Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
                         </div>
 
-                        <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" name="name" value="" class="form-control" placeholder="Enter your name" required>
+                        <div class="mb-3">
+                            <label class="form-label">Bid Price (TK)</label>
+                            <input type="number" name="bid_price" class="form-control" placeholder="Enter your bid"
+                                   min="{{ $crop->bid_rate }}" required>
                         </div>
 
-
-                        <div class="form-group">
-                            <label>Bid price</label>
-                            <input type="number" name="bid_price" value="" class="form-control" placeholder="Enter Bid price" min="{{$crop->bid_rate}}" required>
+                        <div class="mb-3">
+                            <label class="form-label">Message (optional)</label>
+                            <input type="text" name="message" class="form-control" placeholder="Enter message">
                         </div>
 
-                        <div class="form-group">
-                            <label>Message(optional)</label>
-                            <input type="text" name="message" value="" class="form-control" placeholder="Enter message">
-                        </div>
-
-                        <input  type="submit"  value="Bid Submit" class="btn btn-success btn-block">
+                        <button type="submit" class="btn btn-success w-100">Submit Bid</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Bids List -->
+    <div class="mt-5">
+        <h3 class="text-success">💰 Active Bids</h3>
+        @if($bids_msg->isEmpty())
+            <p class="text-muted">No bids found yet.</p>
+        @else
+            @foreach($bids_msg as $bid)
+                <div class="card shadow-sm my-3 border-success rounded-4 p-3">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="mb-1">👤 {{ $bid->cust_username }}</h5>
+                        <small class="text-muted">{{ $bid->created_at }}</small>
+                    </div>
+                    <p class="mb-2">Bid: <strong>{{ $bid->bid_price }} TK</strong></p>
 
+                    <div class="d-flex gap-2">
+                        @if($bid->cust_username == Session::get('c_username') && !Carbon::now()->greaterThan($crop->last_date_bidding))
+                            <a href="{{ route('bid_delete', ['id'=>$bid->id,'crop_id'=>$bid->crop_id]) }}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this bid?');">
+                                🗑 Delete
+                            </a>
+                        @endif
 
-    <!----bidding list Modal start----------->
-
-      <div class="row justify-content-center">
-          <div class="col-md-8">
-              <div>
-                  <h1><small class="pull-right"></small> Bids </h1>
-              </div>
-
-              @if($bids_msg->isEmpty())
-                 Not Found Any Bid
-              @endif   
-              <!-- <h1 class="text-success">{{Session::get('msg')}}</h1> -->
-              @foreach($bids_msg as $bid)
-              <div class="comments-list">
-
-                  <p><small class="float-right">{{$bid->created_at}}</small> </p>
-                  <span class="clearfix"></span>
-                  <div class="media">
-                      <div class="media-body">
-                          <h4 class="media-heading user_name">USER:---{{$bid->cust_username}}</h4>
-                          BID:---{{$bid->bid_price}}TK
-                          <p> 
-                                
-                               @if($bid->cust_username==Session::get('c_username') )
-                                   @if(!Carbon\Carbon::now()->greaterThan($crop->last_date_bidding))
-                                 <a  class="btn btn-danger" href=" {{route('bid_delete',['id'=>$bid->id,'crop_id'=>$bid->crop_id])}}" onclick="return confirm('Are you sure you want to delete?');"><i class="fas fa-trash-alt"></i>delete</a>
-                                   @endif
-                                @endif
-
-
-
-                            @if($crop->username==Session::get('f_username'))
-                            -<a target="_blank" href="{{route('confirm_form',['id'=>$bid->id])}}" class="btn btn-success mb-sm-2"><i class="fa fa-1x fa-reply">confirm</i></a>
-                            @endif          
-                          </p>
-                      </div>
-                  </div>
-                  </div>
-              @endforeach
-                  </div>
-              </div>
-
-
- 
-
-
+                        @if($crop->username == Session::get('f_username'))
+                            <a target="_blank" href="{{ route('confirm_form', ['id'=>$bid->id]) }}"
+                               class="btn btn-success btn-sm">
+                                ✅ Confirm
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        @endif
+    </div>
+</div>
 @endsection

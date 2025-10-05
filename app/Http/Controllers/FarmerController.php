@@ -208,25 +208,9 @@ class FarmerController extends Controller
     /**
      * Logout
      */
-    public function logout($name)
+    public function logout()
     {
-        if ($name == "c_username") {
-            Session::forget('c_username');
-            if (!Session::has('c_username')) {
-                return redirect('/')->with('l_msg', 'Logout successfully');
-            }
-        }
-
-        if ($name == "f_username") {
-            Session::forget('f_username');
-            if (!Session::has('f_username')) {
-                return redirect('/')->with('l_msg', 'Logout successfully');
-            }
-        } else {
-            Session::forget('a_username');
-            if (!Session::has('a_username')) {
-                return redirect('/admin/login')->with('l_msg', 'Logout successfully');
-            }
-        }
-    }
+        Session::forget('f_username');
+        return redirect('/')->with('l_msg', 'Logout successfully');
+    }    
 }

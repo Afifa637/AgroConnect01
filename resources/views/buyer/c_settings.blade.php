@@ -54,6 +54,9 @@
                     @csrf
                     <h3 class="text-center text-success mb-3">Edit Your Information</h3>
                     <input type="hidden" name="id" value="{{$user->id}}">
+                    <div class="mb-3"><label>Username</label>
+                        <input type="text" name="username" class="form-control" value="{{ $user->username }}" required>
+                    </div>
                     <div class="mb-3"><label>Mobile</label>
                         <input type="tel" name="mobile" class="form-control" value="{{$user->mobile}}">
                     </div>
@@ -79,6 +82,12 @@
                             <label><input type="radio" name="gender" value="male" {{ $user->gender == 'male' ? 'checked' : '' }}> Male</label>
                             <label class="ms-3"><input type="radio" name="gender" value="female" {{ $user->gender == 'female' ? 'checked' : '' }}> Female</label>
                         </div>
+                    </div>
+                    <div class="mb-3"><label>Password (leave blank to keep current)</label>
+                        <input type="password" name="password" class="form-control">
+                    </div>
+                    <div class="mb-3"><label>Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="form-control">
                     </div>
                     <div class="mb-3"><label>Profile Image</label>
                         <input type="file" name="profile_image" class="form-control">

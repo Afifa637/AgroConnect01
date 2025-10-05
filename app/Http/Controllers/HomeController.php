@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\farmer_register;
 use App\Models\news_info;
-use App\Models\user_register;
 use App\Models\categories_info;
 use App\Models\crop_import;
 use App\Models\ContactMessage;
-use Carbon\Carbon;
+use App\Models\Bid_message;
 
 class HomeController extends Controller
 {
@@ -72,6 +70,7 @@ class HomeController extends Controller
     public function crop_details($id)
     {
         $crop = crop_import::findOrFail($id);
+        $bids_msg = Bid_message::where('crop_id', $id)->get();
         return view('home.crop_details', compact('crop', 'bids_msg'));
     }
 

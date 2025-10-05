@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\order;
 use App\Models\crop_import;
-use App\Models\pay_confirm_message;
 use App\Models\PayConfirmMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 
-class orderController extends Controller
+class OrderController extends Controller
 {
     /**
      * Payment form view
