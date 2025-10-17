@@ -51,7 +51,7 @@
             @foreach($latestNews as $news)
               <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                  <img src="{{ url($news->news_image) }}" class="card-img-top" alt="">
+                  <img src="{{ asset($news->news_image) }}" class="card-img-top" alt="">
                   <div class="card-body">
                     <h6 class="fw-bold">{{ Str::limit($news->news_name, 40) }}</h6>
                     <p class="small text-muted">{{ Str::limit($news->news_description, 60) }}</p>
@@ -158,7 +158,7 @@
       @forelse($latestNews as $news)
         <div class="col-md-4">
           <div class="card h-100 shadow-sm">
-            <img src="{{ url($news->news_image) }}" class="card-img-top" alt="News Image">
+            <img src="{{ asset($news->news_image) }}" class="card-img-top" alt="News Image">
             <div class="card-body">
               <h6 class="fw-bold">{{ Str::limit($news->news_name, 50) }}</h6>
               <p class="small text-muted">{{ Str::limit($news->news_description, 80) }}</p>

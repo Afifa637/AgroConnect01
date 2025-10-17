@@ -15,7 +15,7 @@ class FarmCropController extends Controller
      */
     public function create()
     {
-        $categories = categories_info::where('categories_status', 'active')->get();
+        $categories = categories_info::where('categories_status', 1)->get();
         return view('farmer.crop_import', compact('categories'));
     }
 

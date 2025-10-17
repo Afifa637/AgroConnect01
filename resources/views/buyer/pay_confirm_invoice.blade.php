@@ -46,7 +46,7 @@
 
     <div class="text-center mt-3">
         <small class="text-muted">Welcome from</small>
-        <img src="{{ url('final_eagri/img/agri.png')}}" width="100" alt="AgroConnect Logo">
+        <img src="{{ asset('final_eagri/img/agri.png')}}" width="100" alt="AgroConnect Logo">
         <small class="text-muted">Limited</small>
     </div>
 </div>

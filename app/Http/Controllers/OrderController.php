@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\order;
+use App\Models\Order;
 use App\Models\crop_import;
 use App\Models\PayConfirmMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     /**
-     * Payment form view
+     * Show payment form
      */
     public function paymentForm($id)
     {
@@ -21,12 +20,11 @@ class OrderController extends Controller
     }
 
     /**
-     * Manual payment submission
+     * Handle manual payment submission
      */
     public function manuallyPayment(Request $request)
     {
         $validated = $request->validate([
-            'f_username'      => 'required|string',
             'c_username'      => 'required|string',
             'crop_id'         => 'required|integer',
             'customer_name'   => 'required|string|max:100',
@@ -40,59 +38,72 @@ class OrderController extends Controller
             'transaction_id'  => 'required|string|max:100',
         ]);
 
-        DB::table('orders')->updateOrInsert([
-            'f_username' => $validated['f_username'],
-            'c_username' => $validated['c_username'],
-            'crop_id'    => $validated['crop_id'],
-        ], [
-            'name'          => $validated['customer_name'],
-            'email'         => $validated['customer_email'],
-            'phone'         => $validated['customer_mobile'],
-            'bid_price'     => $validated['bid_price'],
-            'amount'        => $validated['pay_amount'],
-            'status'        => 'Processing',
-            'address'       => $validated['address'],
-            'division'      => $validated['division'],
-            'zip'           => $validated['zip'],
-            'transaction_id'=> $validated['transaction_id'],
-            'currency'      => 'BDT',
+        // Fetch the crop
+        $crop = crop_import::findOrFail($validated['crop_id']);
+
+        // Ensure the crop has a farmer
+        $f_username = $crop->username ?? null;
+
+        if (!$f_username) {
+            return back()->with('error', '❌ Unable to find farmer for this crop.');
+        }
+
+        // Create a new order record
+        Order::create([
+            'f_username'     => $f_username,
+            'c_username'     => $validated['c_username'],
+            'crop_id'        => $validated['crop_id'],
+            'name'           => $validated['customer_name'],
+            'email'          => $validated['customer_email'],
+            'phone'          => $validated['customer_mobile'],
+            'bid_price'      => $validated['bid_price'],
+            'amount'         => $validated['pay_amount'],
+            'address'        => $validated['address'],
+            'division'       => $validated['division'],
+            'zip'            => $validated['zip'],
+            'status'         => 'Processing',
+            'transaction_id' => $validated['transaction_id'],
+            'currency'       => 'BDT',
         ]);
 
-        $crop = crop_import::findOrFail($validated['crop_id']);
+        // Update crop condition
         $crop->condition = 'Sold';
         $crop->save();
 
         return redirect('/customer/order/messages')
-            ->with('msg', '✅ Payment information sent successfully.');
+            ->with('msg', '✅ Payment information saved successfully.');
     }
 
     /**
-     * Farmer’s orders
+     * Farmer order messages
      */
     public function farmOrderMessages()
-{
-    // Verify farmer is logged in
-    $f_username = Session::get('f_username');
+    {
+        $f_username = Session::get('f_username');
 
-    if (!$f_username) {
-        return redirect()->route('login')->with('error', 'Please login as a farmer to view your orders.');
+        if (!$f_username) {
+            return redirect()->route('login')
+                ->with('error', 'Please login as a farmer to view your orders.');
+        }
+
+        $orders = Order::where('f_username', $f_username)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('farmer.orders_info', compact('orders'));
     }
-    // Fetch only this farmer's orders
-    $orders = order::where('f_username', $f_username)
-                   ->orderByDesc('created_at')
-                   ->get();
-
-    return view('farmer.orders_info', compact('orders'));
-}
 
     /**
-     * Customer’s orders
+     * Customer order messages
      */
     public function custOrderMessages()
     {
-        $orders = order::where('c_username', Session::get('c_username'))
-                       ->orderByDesc('created_at')
-                       ->get();
+        $c_username = Session::get('c_username');
+
+        $orders = Order::where('c_username', $c_username)
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('buyer.orders_info', compact('orders'));
     }
 }

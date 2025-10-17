@@ -17,23 +17,26 @@ class FarmerController extends Controller
      */
     public function f_home()
     {
-        $crops = Crop_import::where('username', Session::get('f_username'))->get();
+        $crops = Crop_import::where('username', Session::get('f_username'))->paginate(10);
         return view('farmer.index', compact('crops'));
     }
 
     public function searchCrops(Request $request)
     {
-        $query = $request->input('q'); // get search term
-        $username = Session::get('f_username'); // search only in this farmer's crops
+        $query = $request->input('query', ''); // default to empty
+        $username = Session::get('f_username');
 
         $crops = Crop_import::where('username', $username)
-            ->where(function ($q) use ($query) {
-                $q->where('crop_name', 'like', "%$query%")
-                    ->orWhere('crop_type', 'like', "%$query%");
+            ->when($query != '', function ($q) use ($query) {
+                $q->where(function ($sub) use ($query) {
+                    $sub->whereRaw('LOWER(crop_name) LIKE ?', ['%' . strtolower($query) . '%'])
+                        ->orWhereRaw('LOWER(crop_type) LIKE ?', ['%' . strtolower($query) . '%']);
+                });
             })
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('farmer.crop_manage', compact('crops', 'query'));
+        return view('farmer.manage_crops', compact('crops', 'query'));
     }
 
     /**
@@ -212,5 +215,5 @@ class FarmerController extends Controller
     {
         Session::forget('f_username');
         return redirect('/')->with('l_msg', 'Logout successfully');
-    }    
+    }
 }

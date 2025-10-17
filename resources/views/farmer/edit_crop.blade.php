@@ -140,7 +140,7 @@
                                 </label>
                                 <input type="file" class="form-control shadow-sm" name="crop_image" id="cropImage1" accept="image/*">
                                 <div class="mt-2">
-                                    <img src="{{ url($crop->crop_image) }}" id="previewImage1" class="img-thumbnail shadow-sm" width="120" alt="Crop Image 1">
+                                    <img src="{{ asset($crop->crop_image) }}" id="previewImage1" class="img-thumbnail shadow-sm" width="120" alt="Crop Image 1">
                                 </div>
                             </div>
 
@@ -151,7 +151,7 @@
                                 </label>
                                 <input type="file" class="form-control shadow-sm" name="crop_image2" id="cropImage2" accept="image/*">
                                 <div class="mt-2">
-                                    <img src="{{ url($crop->crop_image2) }}" id="previewImage2" class="img-thumbnail shadow-sm" width="120" alt="Crop Image 2">
+                                    <img src="{{ asset($crop->crop_image2) }}" id="previewImage2" class="img-thumbnail shadow-sm" width="120" alt="Crop Image 2">
                                 </div>
                             </div>
 

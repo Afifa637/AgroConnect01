@@ -9,7 +9,7 @@
         @foreach($crops as $crop)
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100 shadow-sm">
-                    <img src="{{ url($crop->crop_image) }}" class="card-img-top" alt="{{ $crop->crop_name }}" style="height:200px; object-fit:cover;">
+                    <img src="{{ asset($crop->crop_image) }}" class="card-img-top" alt="{{ $crop->crop_name }}" style="height:200px; object-fit:cover;">
                     <div class="card-body">
                         <h5 class="card-title text-center">{{ $crop->crop_name }}</h5>
                         <p class="mb-1"><strong>Quantity:</strong> {{ $crop->crop_quantity }}</p>

@@ -100,6 +100,7 @@
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
                     </a>
                 </li>
+                @if(Session::has('c_username'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">
                         <i class="fa fa-user-circle me-1"></i>{{ Session::get('c_username') }}
@@ -117,6 +118,7 @@
                         </li>
                     </ul>
                 </li>
+                @endif
             </ul>
         </div>
     </nav>
@@ -124,19 +126,26 @@
     <!-- 🟢 Sidebar -->
     <div class="sidebar">
         <h6>Categories</h6>
-        @foreach($categories ?? [] as $category)
-            <a href="{{ route('Categories', ['crop_type' => $category->crop_type]) }}" 
-               class="{{ request()->is('categories/'.$category->crop_type) ? 'active' : '' }}">
-               <i class="fa fa-seedling me-2"></i> {{ ucfirst($category->crop_type) }}
-            </a>
-        @endforeach
+        @if(!empty($categories))
+            @foreach($categories as $category)
+                @if(!empty($category->crop_type))
+                <a href="{{ route('categories', ['crop_type' => $category->crop_type]) }}" 
+                   class="{{ request()->is('categories/'.$category->crop_type) ? 'active' : '' }}">
+                   <i class="fa fa-seedling me-2"></i> {{ ucfirst($category->crop_type) }}
+                </a>
+                @endif
+            @endforeach
+        @endif
 
         <hr>
 
+        @if(Session::has('c_username'))
         <a href="{{ route('wishlist', ['c_username' => Session::get('c_username')]) }}" 
            class="{{ request()->routeIs('wishlist') ? 'active' : '' }}">
            <i class="fa fa-heart me-2"></i> Wishlist
         </a>
+        @endif
+
         <a href="{{ route('cust_order_messages') }}" 
            class="{{ request()->routeIs('cust_order_messages') ? 'active' : '' }}">
            <i class="fa fa-box me-2"></i> Orders

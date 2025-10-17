@@ -17,7 +17,7 @@
             @if($crop)
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="{{ url($crop->crop_image) }}" class="crop-img card-img-top" alt="{{ $crop->crop_name }}">
+                        <img src="{{ asset($crop->crop_image) }}" class="crop-img card-img-top" alt="{{ $crop->crop_name }}">
                         <div class="card-body item-desc text-center">
                             <h4 class="item-name">{{ $crop->crop_name }}</h4>
                             <p class="mb-1"><strong>Condition:</strong> {{ $crop->condition }}</p>

@@ -9,7 +9,7 @@
         @forelse($newses as $news)
             <div class="col-md-4">
                 <div class="card h-100 shadow-lg border-0 rounded-3">
-                    <img src="{{ url($news->news_image) }}" class="card-img-top" alt="News Image" style="height:200px; object-fit:cover;">
+                    <img src="{{ asset($news->news_image) }}" class="card-img-top" alt="News Image" style="height:200px; object-fit:cover;">
                     <div class="card-body">
                         <h5 class="fw-bold">{{ $news->news_name }}</h5>
                         <p class="small text-muted">{{ Str::limit($news->news_description, 120) }}</p>

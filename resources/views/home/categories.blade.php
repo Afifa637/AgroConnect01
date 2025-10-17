@@ -11,7 +11,7 @@
                 @if($farmer && $farmer->action=="active")
                 <div class="col-lg-4 col-md-6">
                     <div class="card shadow-sm border-0 h-100">
-                        <img src="{{ url($crop->crop_image) }}" class="card-img-top" alt="crop" height="200">
+                        <img src="{{ asset($crop->crop_image) }}" class="card-img-top" alt="crop" height="200">
                         <div class="card-body">
                             <h5 class="fw-bold">{{ $crop->crop_name }}</h5>
                             <p class="text-muted mb-1">Condition: {{ $crop->condition }}</p>

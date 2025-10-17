@@ -16,7 +16,7 @@
         @foreach($crops as $crop)
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card crop-card shadow-sm">
-                    <img src="{{ url($crop->crop_image) }}" alt="{{ $crop->crop_name }}" class="card-img-top">
+                    <img src="{{ asset($crop->crop_image) }}" alt="{{ $crop->crop_name }}" class="card-img-top">
                     <div class="card-body item-desc text-center">
                         <h4 class="item-name">{{ $crop->crop_name }}</h4>
                         <p class="mb-1"><strong>Condition:</strong> {{ $crop->condition }}</p>

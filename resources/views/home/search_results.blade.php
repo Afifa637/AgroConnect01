@@ -13,7 +13,7 @@
         @foreach($results as $crop)
             <div class="col-lg-4 col-md-6">
                 <div class="card shadow-sm border-0 h-100">
-                    <img src="{{ url($crop->crop_image) }}" class="card-img-top" alt="" height="200">
+                    <img src="{{ asset($crop->crop_image) }}" class="card-img-top" alt="" height="200">
                     <div class="card-body">
                         <h5 class="fw-bold">{{ $crop->crop_name }}</h5>
                         <p class="text-muted">{{ Str::limit($crop->crop_description, 60) }}</p>

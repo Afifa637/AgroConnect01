@@ -15,14 +15,15 @@ class CreatePayConfirmMessagesTable extends Migration
     {
         Schema::create('pay_confirm_messages', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('bid_message_id'); // links to bid_messages.id
+            $table->unsignedBigInteger('crop_id');
+            $table->unsignedInteger('bid_message_id')->nullable();
             $table->string('f_username', 20); // references farmer_registers.username
             $table->string('cust_username', 20); // references user_registers.username
             $table->string('crop_name', 15);
             $table->string('account_type', 10);
             $table->string('account_id', 25);
             $table->string('confirm_price', 15);
-            $table->string('message', 70);
+            $table->string('message', 150)->nullable();
             $table->timestamps();
 
             // Foreign keys

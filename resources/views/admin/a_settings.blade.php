@@ -24,7 +24,7 @@
                             <tr><th>Division</th><td>{{ $user->division }}</td></tr>
                             <tr><th>Address</th><td>{{ $user->address }}</td></tr>
                             <tr><th>Gender</th><td>{{ $user->gender }}</td></tr>
-                            <tr><th>Profile Pic</th><td><img src="{{ url($user->profile_pic) }}" alt="profile" height="150" width="150"></td></tr>
+                            <tr><th>Profile Pic</th><td><img src="{{ asset($user->profile_pic) }}" alt="profile" height="150" width="150"></td></tr>
                             <tr><th>Created At</th><td>{{ $user->created_at }}</td></tr>
                         </table>
                     </div>

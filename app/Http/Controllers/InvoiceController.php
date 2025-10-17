@@ -31,12 +31,17 @@ class InvoiceController extends Controller
         $pdf = Pdf::loadView('buyer.pay_confirm_invoice', ['msg' => $msg, 'Bid' => $Bid, 'user' => $user]);
         return $pdf->stream('invoice.pdf');
     }
-
     public function order_download_invoice($id)
     {
         $order = order::findOrFail($id);
         $crop = crop_import::where('id', $order->crop_id)->first();
-        $pdf = Pdf::loadView('order_download_invoice', ['order' => $order, 'crop' => $crop]);
+    
+        // ✅ Corrected path to the Blade file
+        $pdf = Pdf::loadView('farmer.order_download_invoice', [
+            'order' => $order,
+            'crop' => $crop
+        ]);
         return $pdf->stream('invoice.pdf');
     }
+    
 }

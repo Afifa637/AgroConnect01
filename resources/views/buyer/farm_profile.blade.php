@@ -58,7 +58,7 @@
             @php($crop = App\Models\crop_import::where('id', $crop->crop_id)->first())
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="card agri-card h-100">
-                    <img src="{{ url($crop->crop_image) }}" class="card-img-top" alt="crop" style="height:220px; object-fit:cover;">
+                    <img src="{{ asset($crop->crop_image) }}" class="card-img-top" alt="crop" style="height:220px; object-fit:cover;">
                     <div class="agri-card-title text-center">{{ $crop->crop_name }}</div>
                     <div class="agri-card-body text-center">
                         <span class="badge bg-success mb-2">{{ $crop->condition }}</span>

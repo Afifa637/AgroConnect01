@@ -30,7 +30,7 @@
                             <td>{{ $news->news_name }}</td>
                             <td>{{ $news->news_description }}</td>
                             <td class="text-justify">{{ Str::limit($news->long_description, 120) }}</td>
-                            <td><img src="{{ url($news->news_image) }}" alt="{{ $news->news_name }}" width="150" height="100" style="object-fit:cover;"></td>
+                            <td><img src="{{ asset($news->news_image) }}" alt="{{ $news->news_name }}" width="150" height="100" style="object-fit:cover;"></td>
                             <td>
                                 <a href="{{ route('edit_news',['id'=>$news->id]) }}"
                                    class="btn btn-sm btn-agro" onclick="return confirm('Edit this news?');" title="Edit">

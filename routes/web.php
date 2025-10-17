@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FarmerController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\RegisterLoginCheckController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Http\Request;
 
 /*
@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 | Email Verification Routes
 |--------------------------------------------------------------------------
 */
+
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
@@ -47,7 +48,7 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/news_info', 'news_info')->name('news_info');
 
     // Crops
-    Route::get('/categories/{crop_type}', 'Categories')->name('Categories');
+    Route::get('/categories/{crop_type}', 'Categories')->name('categories');
     Route::get('/sessions/categories/{crop_type}/{crop_session}', 'Session_Categories')->name('Session_Categories');
     Route::get('/crop_details/{id}', 'crop_details')->name('crop_details');
 
@@ -93,16 +94,15 @@ Route::controller(AdminLoginController::class)->group(function () {
     Route::post('/admin_pass_change_save/{email}', 'admin_pass_change_save')->name('admin_pass_change_save');
 
     // Route::middleware('a_check')->group(function () {
-        Route::get('/admin/signup', 'admin_signup')->name('admin_signup');
-        Route::post('admin/signup/save', 'admin_registerSave')->name('admin_registerSave');
-        Route::get('/account_verify/{username}', 'admin_account_verify')->name('admin_account_verify');
-        Route::post('/admin/registerUpdate', 'adminregisterUpdate')->name('adminregisterUpdate');
+    Route::get('/admin/signup', 'admin_signup')->name('admin_signup');
+    Route::post('admin/signup/save', 'admin_registerSave')->name('admin_registerSave');
+    Route::get('/account_verify/{username}', 'admin_account_verify')->name('admin_account_verify');
+    Route::post('/admin/registerUpdate', 'adminregisterUpdate')->name('adminregisterUpdate');
     //});
     Route::post('/admin/logout', function (Request $request) {
-    $request->session()->flush();
-    return redirect('/admin/login');
-})->name('admin.logout');
-
+        $request->session()->flush();
+        return redirect('/admin/login');
+    })->name('admin.logout');
 });
 
 /*
@@ -225,26 +225,16 @@ Route::middleware(['farmer.check'])->group(function () {
         Route::post('/order/manual/payment', 'manuallyPayment')->name('farmer_order_manual_payment');
     });
 });
-
-
 /*
 |--------------------------------------------------------------------------
 | Buyer Routes
 |--------------------------------------------------------------------------
 */
 Route::controller(BuyerController::class)->group(function () {
-    // Buyer profile
     Route::get('/customer/profile/{c_username}', 'cust_profile')->name('cust_profile');
-
-    // Buyer messages
     Route::get('/confirm/message', 'c_message')->name('c_message');
-
-    // Buyer settings
     Route::get('/customer', 'c_settings')->name('c_settings');
-
-    // Update Buyer info
     Route::post('/customer/registerUpdate', 'customerRegisterUpdate')->name('customerRegisterUpdate');
-    // Farmer profile view for buyer
     Route::get('/farmer/profile/check/{f_username}', 'farm_profile')->name('farm_profile');
     Route::post('/buyer/logout',  'logout')->name('buyer.logout');
 });
@@ -267,5 +257,12 @@ Route::controller(BidController::class)->group(function () {
 
 // Orders for buyers
 Route::get('/customer/order/messages', [OrderController::class, 'custOrderMessages'])->name('cust_order_messages');
-Route::get('/order/payment/form/{id}', [OrderController::class, 'payment_form'])->name('payment_form');
-Route::post('/payment/manually', [OrderController::class, 'manually_payment'])->name('manually_payment');
+Route::get('/order/payment/form/{id}', [OrderController::class, 'paymentForm'])->name('payment_form');
+Route::post('/payment/manually', [OrderController::class, 'manuallyPayment'])->name('manually_payment');
+
+// ================= Invoice Routes =================
+Route::controller(InvoiceController::class)->group(function () {
+    Route::get('/bid_details/download/invoices/{id}', 'bids_download_invoice')->name('bids_download_invoice');
+    Route::get('/Pay_Confirm/download/invoice/{id}', 'pay_confirm_download_invoice')->name('pay_confirm_download_invoice');
+    Route::get('/invoice/order/{id}', 'order_download_invoice')->name('order_download_invoice');
+});

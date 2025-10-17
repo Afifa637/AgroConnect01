@@ -24,7 +24,7 @@
                         <tr><th>Zip Code</th><td>{{ $user->zip_code }}</td></tr>
                         <tr><th>Address</th><td>{{ $user->address }}</td></tr>
                         <tr><th>Gender</th><td>{{ $user->gender }}</td></tr>
-                        <tr><th>Profile Pic</th><td><img src="{{ url($user->profile_pic) }}" height="200" width="200" alt="profile"></td></tr>
+                        <tr><th>Profile Pic</th><td><img src="{{ asset($user->profile_pic) }}" height="200" width="200" alt="profile"></td></tr>
                         <tr><th>Created At</th><td>{{ $user->created_at }}</td></tr>
                     </table>
                 </div>
@@ -37,11 +37,11 @@
                             <table class="table table-bordered mt-3 text-center">
                                 <tr>
                                     <th>NID Frontside</th>
-                                    <td><img src="{{ url($user->NID_1) }}" alt="NID front" style="max-width:100%; height:auto;"></td>
+                                    <td><img src="{{ asset($user->NID_1) }}" alt="NID front" style="max-width:100%; height:auto;"></td>
                                 </tr>
                                 <tr>
                                     <th>NID Backside</th>
-                                    <td><img src="{{ url($user->NID_2) }}" alt="NID back" style="max-width:100%; height:auto;"></td>
+                                    <td><img src="{{ asset($user->NID_2) }}" alt="NID back" style="max-width:100%; height:auto;"></td>
                                 </tr>
                             </table>
                         </div>

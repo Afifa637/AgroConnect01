@@ -31,7 +31,7 @@
                 </p>
             </div>
             <div class="col-lg-6 text-center">
-                <img src="{{ url('final_eagri/img/crop.jpg')}}" class="img-fluid rounded-3 shadow-lg" alt="Crops">
+                <img src="{{ asset('final_eagri/img/crop.jpg')}}" class="img-fluid rounded-3 shadow-lg" alt="Crops">
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
     <div class="container">
         <div class="row g-5 align-items-center">
             <div class="col-lg-6 text-center">
-                <img src="{{ url('final_eagri/img/service.jpg')}}" class="img-fluid rounded-3 shadow-lg" alt="Service">
+                <img src="{{ asset('final_eagri/img/service.jpg')}}" class="img-fluid rounded-3 shadow-lg" alt="Service">
             </div>
             <div class="col-lg-6">
                 <h2 class="fw-bold text-dark mb-3"><i class="fas fa-leaf"></i> About E-Agriculture</h2>
