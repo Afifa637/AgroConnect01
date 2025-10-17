@@ -14,7 +14,7 @@ class OrderController extends Controller
     /**
      * Payment form view
      */
-    public function payment_form($id)
+    public function paymentForm($id)
     {
         $confirms = PayConfirmMessage::findOrFail($id);
         return view('buyer.payment_form', compact('confirms'));
@@ -23,7 +23,7 @@ class OrderController extends Controller
     /**
      * Manual payment submission
      */
-    public function manually_payment(Request $request)
+    public function manuallyPayment(Request $request)
     {
         $validated = $request->validate([
             'f_username'      => 'required|string',
@@ -69,18 +69,26 @@ class OrderController extends Controller
     /**
      * Farmer’s orders
      */
-    public function farm_order_messages()
-    {
-        $orders = order::where('f_username', Session::get('f_username'))
-                       ->orderByDesc('created_at')
-                       ->get();
-        return view('farmer.orders_info', compact('orders'));
+    public function farmOrderMessages()
+{
+    // Verify farmer is logged in
+    $f_username = Session::get('f_username');
+
+    if (!$f_username) {
+        return redirect()->route('login')->with('error', 'Please login as a farmer to view your orders.');
     }
+    // Fetch only this farmer's orders
+    $orders = order::where('f_username', $f_username)
+                   ->orderByDesc('created_at')
+                   ->get();
+
+    return view('farmer.orders_info', compact('orders'));
+}
 
     /**
      * Customer’s orders
      */
-    public function cust_order_messages()
+    public function custOrderMessages()
     {
         $orders = order::where('c_username', Session::get('c_username'))
                        ->orderByDesc('created_at')

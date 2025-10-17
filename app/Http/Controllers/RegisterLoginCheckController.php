@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\farmer_register;
-use Illuminate\Http\Request;
 use App\Models\user_register;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 
 class RegisterLoginCheckController extends Controller
@@ -28,12 +28,10 @@ class RegisterLoginCheckController extends Controller
 
         $role = $request->register_as;
 
+        // Determine which table to query
         $user = $role === 'farmer'
             ? farmer_register::where('email', $request->email)->first()
             : user_register::where('email', $request->email)->first();
-
-        $redirectRoute = $role === 'farmer' ? '/farmer/home/page' : '/';
-        $sessionKey    = $role === 'farmer' ? 'f_username' : 'c_username';
 
         if (!$user) {
             return back()->with('login_error', 'Email not found, please SignUp.');
@@ -47,8 +45,24 @@ class RegisterLoginCheckController extends Controller
             return back()->with('login_error', 'Your account is disabled, contact admin.');
         }
 
-        Session::put($sessionKey, $user->username);
-        return redirect($redirectRoute)->with('login_success', 'Login successful!');
+        // Set session based on role
+        if ($role === 'farmer') {
+            Session::put([
+                'f_username' => $user->username,
+                'f_email'    => $user->email,
+                'f_mobile'   => $user->mobile,
+                'f_profile'  => $user->profile_pic,
+            ]);
+            return redirect()->route('f_home')->with('login_success', 'Welcome, Farmer!');
+        } else {
+            Session::put([
+                'c_username' => $user->username,
+                'c_email'    => $user->email,
+                'c_mobile'   => $user->mobile,
+                'c_profile'  => $user->profile_pic,
+            ]);
+            return redirect()->route('c_settings')->with('login_success', 'Welcome, Buyer!');
+        }
     }
 
     /** ================= REGISTER ================= */
@@ -93,28 +107,33 @@ class RegisterLoginCheckController extends Controller
         $model->zip_code    = $request->zip_code;
         $model->gender      = $request->gender;
         $model->password    = Hash::make($request->password);
-
-        // File uploads
         $model->profile_pic = $request->hasFile('profile_pic') ? $request->file('profile_pic')->store('profiles', 'public') : null;
         $model->NID_1       = $request->hasFile('NID_1') ? $request->file('NID_1')->store('nids', 'public') : null;
         $model->NID_2       = $request->hasFile('NID_2') ? $request->file('NID_2')->store('nids', 'public') : null;
-
-        // Default values
-        $model->action    = 'active';
-        $model->condition = 'unverified';
-
+        $model->action      = 'active';
+        $model->condition   = 'unverified';
         $model->save();
-        // Automatically log in the user
+
+        // Set session and redirect immediately after registration
         if ($role === 'farmer') {
-            Auth::guard('web')->login($model);
+            Session::put([
+                'f_username' => $model->username,
+                'f_email'    => $model->email,
+                'f_mobile'   => $model->mobile,
+                'f_profile'  => $model->profile_pic,
+            ]);
+            event(new Registered($model));
+            return redirect()->route('f_home')->with('reg_success', 'Welcome, Farmer! Your account has been created.');
         } else {
-            Auth::guard('web')->login($model);
+            Session::put([
+                'c_username' => $model->username,
+                'c_email'    => $model->email,
+                'c_mobile'   => $model->mobile,
+                'c_profile'  => $model->profile_pic,
+            ]);
+            event(new Registered($model));
+            return redirect()->route('c_settings')->with('reg_success', 'Welcome, Buyer! Your account has been created.');
         }
-        $model->sendEmailVerificationNotification();
-        // Fire email verification event
-        event(new Registered($model));
-        return redirect('/signup')
-            ->with('reg_success', 'Registration successful! Please verify your email.');
     }
 
     /** ================= PASSWORD RESET ================= */

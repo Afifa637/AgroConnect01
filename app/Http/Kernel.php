@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http;
-
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -45,7 +43,8 @@ class Kernel extends HttpKernel
      * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
+        'farmer.check' => \App\Http\Middleware\FarmerLoginCheck::class,
         'check.session' => \App\Http\Middleware\CheckSession::class,
-        'f_check' => \App\Http\Middleware\FarmerLoginCheck::class,
     ];
+    
 }
