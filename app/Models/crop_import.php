@@ -8,4 +8,8 @@ class crop_import extends Model
 {
     //
      protected $fillable=['username','crop_name','crop_session','crop_type','crop_quantity','crop_location','bid_rate','crop_description','last_date_bidding','crop_image','crop_image2','status','condition','Action'];
+     public function category()
+    {
+        return $this->belongsTo(categories_info::class, 'crop_type', 'id');
+    }
 }

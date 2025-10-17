@@ -266,6 +266,6 @@ Route::controller(BidController::class)->group(function () {
 });
 
 // Orders for buyers
-Route::get('/customer/order/messages', [OrderController::class, 'cust_order_messages'])->name('cust_order_messages');
+Route::get('/customer/order/messages', [OrderController::class, 'custOrderMessages'])->name('cust_order_messages');
 Route::get('/order/payment/form/{id}', [OrderController::class, 'payment_form'])->name('payment_form');
 Route::post('/payment/manually', [OrderController::class, 'manually_payment'])->name('manually_payment');

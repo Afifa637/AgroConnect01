@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\crop_import;
+use App\Models\categories_info;
 use App\Models\farmer_register;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -14,7 +15,8 @@ class FarmCropController extends Controller
      */
     public function create()
     {
-        return view('farmer.crop_import');
+        $categories = categories_info::where('categories_status', 'active')->get();
+        return view('farmer.crop_import', compact('categories'));
     }
 
     /**

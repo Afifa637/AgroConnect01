@@ -34,11 +34,11 @@ class AdminLoginController extends Controller
                 Session::put('a_username', $result->username);
                 return redirect()->route('a_home')->with('a_login', 'Login successfully');
             } else {
-                return redirect()->route('admin.login')->with('login_error', 'Password not match');
+                return redirect()->route('admin.login.page')->with('login_error', 'Password not match');
             }
         }
 
-        return redirect()->route('admin.login')->with('login_error', 'Please SignUp');
+        return redirect()->route('admin.login.page')->with('login_error', 'Please SignUp');
     }
 
     public function admin_signup()
@@ -84,7 +84,7 @@ class AdminLoginController extends Controller
         //     $message->subject('verification_mail');
         // });
 
-        return redirect()->route('admin.login')->with('msg', 'Registration successful, please verify your account');
+        return redirect()->route('admin.login.page')->with('msg', 'Registration successful, please verify your account');
     }
 
     public function admin_account_verify($username)
@@ -93,9 +93,9 @@ class AdminLoginController extends Controller
         if ($farm) {
             $farm->condition = "verified";
             $farm->save();
-            return redirect()->route('admin.login')->with('msg', 'Verified successfully');
+            return redirect()->route('admin.login.page')->with('msg', 'Verified successfully');
         }
-        return redirect()->route('admin.login')->with('msg', 'User not found');
+        return redirect()->route('admin.login.page')->with('msg', 'User not found');
     }
 
     public function admin_pw_change_link(Request $request)
@@ -111,7 +111,7 @@ class AdminLoginController extends Controller
         //     $message->subject('pw_change_mail');
         // });
 
-        return redirect()->route('admin.login')->with('msg', 'We sent mail for change password');
+        return redirect()->route('admin.login.page')->with('msg', 'We sent mail for change password');
     }
 
     public function admin_pw_change($email)
@@ -137,10 +137,10 @@ class AdminLoginController extends Controller
         if ($pw_change) {
             $pw_change->password = Hash::make($request->password);
             $pw_change->save();
-            return redirect()->route('admin.login')->with('msg', 'Password changed successfully. Now login.');
+            return redirect()->route('admin.login.page')->with('msg', 'Password changed successfully. Now login.');
         }
 
-        return redirect()->route('admin.login')->with('msg', 'User not found.');
+        return redirect()->route('admin.login.page')->with('msg', 'User not found.');
     }
 
     public function adminregisterUpdate(Request $request)

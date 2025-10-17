@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('crop_session',10);
             $table->integer('crop_type')->unsigned();
             $table->string('crop_quantity',25);
-            $table->string('crop_location',50);
+            $table->string('crop_location',500)->nullable();
             $table->string('bid_rate',10);
             $table->string('crop_description',255);
             $table->date('last_date_bidding');
