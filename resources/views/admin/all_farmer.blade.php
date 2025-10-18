@@ -4,11 +4,11 @@
 <div class="container-fluid py-4">
 <div class="row">
     <div class="col-12">
-        <h3 class="text-agro text-center mb-3">Manage Farmers</h3>
+        <h3 class="text-success text-center mb-3"><i class="fa-solid fa-tractor"></i> Manage Farmers</h3>
 
         <div class="table-responsive">
-            <table class="table table-bordered table-hover text-center">
-                <thead class="thead-light">
+            <table class="table table-bordered table-hover text-center align-middle">
+                <thead class="bg-success text-white">
                     <tr>
                         <th>Sl No</th>
                         <th>Name</th>
@@ -33,31 +33,29 @@
                             <td>{{ $user->zip_code }}</td>
                             <td>
                                 @if($user->action == 'active')
-                                    <span class="badge badge-success">Active</span>
+                                    <span class="badge badge-success"><i class="fa-solid fa-check"></i> Active</span>
                                 @else
-                                    <span class="badge badge-secondary">Inactive</span>
+                                    <span class="badge badge-secondary"><i class="fa-solid fa-pause"></i> Inactive</span>
                                 @endif
                             </td>
                             <td>
                                 <a href="{{ route('farmer_profile',['id'=>$user->id]) }}" class="btn btn-sm btn-outline-info" title="Profile">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa-solid fa-user"></i>
                                 </a>
 
                                 <a href="{{ route('user_details',['id'=>$user->id]) }}" class="btn btn-sm btn-outline-primary" title="Details">
-                                    <i class="fas fa-info-circle"></i>
+                                    <i class="fa-solid fa-circle-info"></i>
                                 </a>
 
                                 @if($user->action == 'active')
-                                    <a href="{{ route('f_action',['id'=>$user->id]) }}"
-                                       class="btn btn-sm btn-outline-danger"
+                                    <a href="{{ route('f_action',['id'=>$user->id]) }}" class="btn btn-sm btn-outline-danger"
                                        onclick="return confirm('Are you sure you want to deactivate?');" title="Deactivate">
-                                        <i class="fas fa-arrow-circle-down"></i>
+                                        <i class="fa-solid fa-arrow-down"></i>
                                     </a>
                                 @else
-                                    <a href="{{ route('f_action',['id'=>$user->id]) }}"
-                                       class="btn btn-sm btn-outline-success"
+                                    <a href="{{ route('f_action',['id'=>$user->id]) }}" class="btn btn-sm btn-outline-success"
                                        onclick="return confirm('Are you sure you want to activate?');" title="Activate">
-                                        <i class="fas fa-arrow-circle-up"></i>
+                                        <i class="fa-solid fa-arrow-up"></i>
                                     </a>
                                 @endif
                             </td>
