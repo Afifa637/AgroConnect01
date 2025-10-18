@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\categories_info;
 use App\Models\farmer_register;
 use Illuminate\Http\Request;
@@ -38,7 +38,7 @@ class FarmCropController extends Controller
             'crop_image2'      => 'nullable|image|max:2048',
         ]);
 
-        $crop = new crop_import($validated);
+        $crop = new CropImport($validated);
 
         if ($request->hasFile('crop_image')) {
             $crop->crop_image = $request->file('crop_image')->store('crop_images', 'public');
@@ -48,7 +48,7 @@ class FarmCropController extends Controller
             $crop->crop_image2 = $request->file('crop_image2')->store('crop_images', 'public');
         }
 
-        $crop->status = 1;
+        $crop->status = "1";
         $crop->condition = "New";
         $crop->Action = "Published";
         $crop->save();
@@ -61,7 +61,7 @@ class FarmCropController extends Controller
      */
     public function index()
     {
-        $crops = crop_import::where('username', Session::get('f_username'))
+        $crops = CropImport::where('username', Session::get('f_username'))
             ->where('Action', '!=', "deleted")
             ->paginate(9);
 
@@ -73,7 +73,7 @@ class FarmCropController extends Controller
      */
     public function edit($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         return view('farmer.edit_crop', compact('crop'));
     }
 
@@ -95,7 +95,7 @@ class FarmCropController extends Controller
             'crop_image2'       => 'nullable|image|max:2048',
         ]);
 
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $crop->fill($validated);
 
         if ($request->hasFile('crop_image')) {
@@ -118,7 +118,7 @@ class FarmCropController extends Controller
      */
     public function toggleStatus($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $crop->status = !$crop->status;
         $crop->save();
 
@@ -130,7 +130,7 @@ class FarmCropController extends Controller
      */
     public function destroy($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $crop->Action = "deleted";
         $crop->save();
 
@@ -145,7 +145,7 @@ class FarmCropController extends Controller
         $username = Session::get('f_username');
 
         $user = farmer_register::where('username', $username)->first();
-        $crops = crop_import::where('username', $username)
+        $crops = CropImport::where('username', $username)
             ->where('Action', '!=', 'deleted')
             ->orderByDesc('id')
             ->get();

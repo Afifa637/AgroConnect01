@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\PayConfirmMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -39,7 +39,7 @@ class OrderController extends Controller
         ]);
 
         // Fetch the crop
-        $crop = crop_import::findOrFail($validated['crop_id']);
+        $crop = CropImport::findOrFail($validated['crop_id']);
 
         // Ensure the crop has a farmer
         $f_username = $crop->username ?? null;

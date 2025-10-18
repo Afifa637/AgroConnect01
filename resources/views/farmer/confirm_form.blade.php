@@ -15,14 +15,15 @@
                     <div class="alert alert-success text-center">{{ Session::get('msg') }}</div>
                 @endif
 
-                <form action="{{ route('pay_confirm_message') }}" method="post">
+                <form action="{{ route('confirm_payment', $bid->id) }}" method="post">
                     @csrf
-
+                
+                    <input type="hidden" name="bid_message_id" value="{{ $bid->id }}">
                     <input type="hidden" name="crop_id" value="{{ $bid->crop_id }}">
                     <input type="hidden" name="f_username" value="{{ $bid->f_username }}">
                     <input type="hidden" name="crop_name" value="{{ $bid->crop_name }}">
                     <input type="hidden" name="cust_username" value="{{ $bid->cust_username }}">
-
+                
                     <div class="mb-3">
                         <label class="form-label fw-bold">Account Type</label>
                         <select class="form-select" name="account_type" required>
@@ -32,7 +33,7 @@
                             <option value="nagad">Nagad</option>
                         </select>
                     </div>
-
+                
                     <div class="mb-3">
                         <label class="form-label fw-bold">Account ID</label>
                         <input type="tel" name="account_id" class="form-control" placeholder="Ex: 018********" required>
@@ -40,21 +41,21 @@
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
-
+                
                     <div class="mb-3">
                         <label class="form-label fw-bold">Confirm Price</label>
                         <input type="number" name="confirm_price" class="form-control" placeholder="Enter confirmed price" min="1" required>
                     </div>
-
+                
                     <div class="mb-3">
                         <label class="form-label fw-bold">Message (Optional)</label>
                         <input type="text" name="message" class="form-control" placeholder="Enter message (if any)">
                     </div>
-
+                
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-check-circle"></i> Submit Confirmation
                     </button>
-                </form>
+                </form>                
             </div>
         </div>
     </div>

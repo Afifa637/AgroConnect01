@@ -12,6 +12,7 @@ use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\SslCommerzPaymentController;
 use Illuminate\Http\Request;
 
 /*
@@ -130,6 +131,9 @@ Route::prefix('admin')->controller(AdminController::class)->group(function () {
     Route::get('/categories/delete/{id}', 'categories_delete')->name('categories_delete');
 
     // News
+    Route::get('/news',  'news_page')->name('news_page');
+Route::get('/news/ajax/{id}',  'ajax_news');
+
     Route::get('/add/news', 'add_news')->name('add_news');
     Route::post('/news/save', 'save_news_db')->name('save_news_db');
     Route::get('/manage/news', 'manage_news')->name('manage_news');
@@ -151,7 +155,6 @@ Route::prefix('admin')->controller(AdminController::class)->group(function () {
     Route::get('user/details/{id}', 'user_details')->name('user_details');
     Route::get('/search', 'admin_search')->name('admin_search');
     Route::get('/contact-messages',  'contact_messages')->name('admin.contact_messages');
-
 });
 /*
 |--------------------------------------------------------------------------
@@ -184,6 +187,7 @@ Route::middleware(['farmer.check'])->group(function () {
         // Confirmations
         Route::get('/farmer/confirm/form/{id}', 'confirm_form')->name('confirm_form');
         Route::get('/farmer/confirm/crops', 'confirm_crops')->name('confirm_crops');
+        Route::post('/farmer/confirm/payment/{id}', 'confirmPayment')->name('confirm_payment');
         Route::get('/farmer/confirm/delete/{id}', 'delete_confirm')->name('delete_confirm');
 
         // Profile & Settings
@@ -231,6 +235,7 @@ Route::middleware(['farmer.check'])->group(function () {
 | Buyer Routes
 |--------------------------------------------------------------------------
 */
+Route::middleware(['customer.check'])->group(function () {
 Route::controller(BuyerController::class)->group(function () {
     Route::get('/customer/profile/{c_username}', 'cust_profile')->name('cust_profile');
     Route::get('/confirm/message', 'c_message')->name('c_message');
@@ -239,10 +244,11 @@ Route::controller(BuyerController::class)->group(function () {
     Route::get('/farmer/profile/check/{f_username}', 'farm_profile')->name('farm_profile');
     Route::post('/buyer/logout',  'logout')->name('buyer.logout');
 });
+});
 
 // Wishlist Routes
 Route::controller(WishlistController::class)->group(function () {
-    Route::get('/customer/wishlist/save/{id}', 'wishlist_db')->name('wishlist_db');
+    Route::post('/customer/wishlist/save/{id}', 'wishlist_db')->name('wishlist_db');
     Route::get('/customer/wishlist/{c_username}', 'wishlist')->name('wishlist');
     Route::get('/wishlist/remove/{id}', 'wishlist_remove')->name('wishlist_remove');
 });

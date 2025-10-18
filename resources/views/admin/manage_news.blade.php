@@ -40,7 +40,10 @@ table th { background:#e8f5e9; color:#1b5e20; }
           <td>{{ $news->news_name }}</td>
           <td>{{ $news->news_description }}</td>
           <td class="text-start">{{ Str::limit($news->long_description,120) }}</td>
-          <td><img src="{{ asset($news->news_image) }}" alt="{{ $news->news_name }}" width="140" height="90" class="rounded"></td>
+          <td>
+            <img src="{{ url($news->news_image) }}" alt="{{ $news->news_name }}" style="width:140px; height:90px;">
+        </td>
+                                  
           <td>
             <a href="{{ route('edit_news',['id'=>$news->id]) }}"
                class="btn btn-sm btn-agro" onclick="return confirm('Edit this news?');" title="Edit">

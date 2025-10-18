@@ -4,18 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\admin_register;
-use App\Models\contact_message;
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\farmer_register;
 use App\Models\news_info;
 use App\Models\user_register;
 use App\Models\Bid_message;
 use App\Models\categories_info;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use App\Http\Middleware\AdminLoginMiddleware;
 use App\Models\ContactMessage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -40,43 +37,43 @@ class AdminController extends Controller
     // Published crops (paginated)
     public function published_crops()
     {
-        $crops = crop_import::where('Action', "Published")->paginate(11);
+        $crops = CropImport::where('Action', "Published")->paginate(11);
         return view('admin.published_crops', compact('crops'));
     }
 
     public function unpublished_crops()
     {
-        $crops = crop_import::where('Action', "Unpublished")->paginate(11);
+        $crops = CropImport::where('Action', "Unpublished")->paginate(11);
         return view('admin.unpublished_crops', compact('crops'));
     }
 
     public function crop_published_save($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $crop->Action = "Published";
         $crop->save();
-        return redirect()->route('unpublished.crops') // ensure route name exists
+        return redirect()->route('unpublished_crops') // ensure route name exists
             ->with('msg', 'Crop Published Successfully');
     }
 
     public function crop_unpublished_save($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $crop->Action = "Unpublished";
         $crop->save();
-        return redirect()->route('published.crops') // ensure route name exists
+        return redirect()->route('published_crops') // ensure route name exists
             ->with('msg', 'Crop Unpublished Successfully');
     }
 
     public function deleted_crops()
     {
-        $crops = crop_import::where('Action', "deleted")->get();
+        $crops = CropImport::where('Action', "deleted")->get();
         return view('admin.deleted_crops', compact('crops'));
     }
 
     public function crop_delete($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $crop->delete();
         return redirect()->route('deleted.crops')->with('msg', 'Crop Delete Successfully');
     }
@@ -119,7 +116,7 @@ class AdminController extends Controller
         $categories->save();
 
         $msg = $categories->categories_status == 1 ? 'category activated successfully' : 'category deactivated successfully';
-        return redirect()->route('manage.categories')->with('msg', $msg);
+        return redirect()->route('manage_categories')->with('msg', $msg);
     }
 
     public function edit_categories($id)
@@ -143,14 +140,14 @@ class AdminController extends Controller
         $categories->categories_status = 1;
         $categories->save();
 
-        return redirect()->route('manage.categories')->with('msg', 'Category updated successfully');
+        return redirect()->route('manage_categories')->with('msg', 'Category updated successfully');
     }
 
     public function categories_delete($id)
     {
         $categories = categories_info::findOrFail($id);
         $categories->delete();
-        return redirect()->route('manage.categories')->with('msg', 'Category deleted successfully');
+        return redirect()->route('manage_categories')->with('msg', 'Category deleted successfully');
     }
 
     // News
@@ -169,26 +166,28 @@ class AdminController extends Controller
             'news_image' => 'required|image|max:5120',
         ]);
 
-        $imageUrl = null;
-        if ($request->hasFile('news_image')) {
-            $file = $request->file('news_image');
-            $imageName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-            // store in storage/app/public/news_images
-            $file->storeAs('public/news_images', $imageName);
-            // generate public url: /storage/news_images/...
-            $imageUrl = Storage::url('news_images/' . $imageName);
-        }
-
-        $news = new news_info();
+        $news = new news_info(); // create the object first
         $news->username = $request->username;
         $news->news_name = $request->news_name;
         $news->news_description = $request->news_description;
         $news->long_description = $request->long_description;
-        $news->news_image = $imageUrl;
-        $news->save();
 
+        if ($request->hasFile('news_image')) {
+            $file = $request->file('news_image');
+            $imageName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))
+                . '.' . $file->getClientOriginalExtension();
+
+            // store in storage/app/public/news_images
+            $file->storeAs('public/news_images', $imageName);
+
+            // assign public URL to model
+            $news->news_image = 'storage/news_images/' . $imageName;
+        }
+
+        $news->save();
         return redirect()->route('a_home')->with('msg', 'News published successfully');
     }
+
 
     public function manage_news()
     {
@@ -231,14 +230,14 @@ class AdminController extends Controller
         }
         $news->save();
 
-        return redirect()->route('manage.news')->with('msg', 'News updated successfully');
+        return redirect()->route('manage_news')->with('msg', 'News updated successfully');
     }
 
     public function delete_news($id)
     {
         $news = news_info::findOrFail($id);
         $news->delete();
-        return redirect()->route('manage.news')->with('msg', 'News deleted successfully');
+        return redirect()->route('manage_news')->with('msg', 'News deleted successfully');
     }
 
     // Admin profile & settings
@@ -305,7 +304,7 @@ class AdminController extends Controller
     {
         $user = farmer_register::findOrFail($id);
         Session::put('fa_login', $user->username);
-        $crops = crop_import::where('username', $user->username)->get();
+        $crops = CropImport::where('username', $user->username)->get();
         return view('admin.farmer_profile', compact('crops'));
     }
 
@@ -327,14 +326,14 @@ class AdminController extends Controller
     {
         $search_tx1 = $request->search;
 
-        $search = crop_import::orderBy('id', 'desc')
+        $search = CropImport::orderBy('id', 'desc')
             ->where(function ($q) use ($search_tx1) {
                 $q->where('crop_name', 'LIKE', "%{$search_tx1}%")
                     ->orWhere('crop_type', 'LIKE', "%{$search_tx1}%")
                     ->orWhere('crop_location', 'LIKE', "%{$search_tx1}%");
             })
             ->where('Action', "Published")
-            ->where('status', 1)
+            ->where('status', '1')
             ->get();
 
         return view('admin.search', ['s' => $search]);

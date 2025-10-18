@@ -27,14 +27,14 @@
             <div class="card border-0 shadow-sm text-center p-3">
                 <i class="bi bi-check-circle fs-1 text-success"></i>
                 <h6>Published Crops</h6>
-                <h3>{{ \App\Models\crop_import::where('Action','Published')->count() }}</h3>
+                <h3>{{ \App\Models\CropImport::where('Action','Published')->count() }}</h3>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm text-center p-3">
                 <i class="bi bi-x-circle fs-1 text-danger"></i>
                 <h6>Unpublished Crops</h6>
-                <h3>{{ \App\Models\crop_import::where('Action','Unpublished')->count() }}</h3>
+                <h3>{{ \App\Models\CropImport::where('Action','Unpublished')->count() }}</h3>
             </div>
         </div>
     </div>
@@ -84,9 +84,9 @@
             labels: ['Published', 'Unpublished', 'Deleted'],
             datasets: [{
                 data: [
-                    {{ \App\Models\crop_import::where('Action','Published')->count() }},
-                    {{ \App\Models\crop_import::where('Action','Unpublished')->count() }},
-                    {{ \App\Models\crop_import::where('Action','deleted')->count() }}
+                    {{ \App\Models\CropImport::where('Action','Published')->count() }},
+                    {{ \App\Models\CropImport::where('Action','Unpublished')->count() }},
+                    {{ \App\Models\CropImport::where('Action','deleted')->count() }}
                 ],
                 backgroundColor: ['#198754', '#dc3545', '#adb5bd']
             }]

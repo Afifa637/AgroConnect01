@@ -13,7 +13,7 @@
 <section id="menu-section" class="my-4">
     <div class="row">
         @foreach($crops as $record)
-            @php($crop = App\Models\crop_import::where('id', $record->crop_id)->first())
+            @php($crop = App\Models\CropImport::where('id', $record->crop_id)->first())
             @if($crop)
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm">

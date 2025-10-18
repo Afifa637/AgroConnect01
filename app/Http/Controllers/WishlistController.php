@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\wishlist;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class WishlistController extends Controller
@@ -14,15 +13,25 @@ class WishlistController extends Controller
      */
     public function wishlist_db($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $c_username = Session::get('c_username');
 
+        if (!$c_username) {
+            return redirect()->route('login')->with('msg', '⚠️ Please log in to add items to your wishlist.');
+        }
+        $crop = CropImport::findOrFail($id);
+        $exists = Wishlist::where('crop_id', $crop->id)
+            ->where('c_username', $c_username)
+            ->exists();
+        if ($exists) {
+            return back()->with('msg', '💚 This crop is already in your wishlist.');
+        }
         Wishlist::create([
             'crop_id'    => $crop->id,
             'f_username' => $crop->username,
-            'c_username' => Session::get('c_username'),
+            'c_username' => $c_username,
         ]);
 
-        return redirect('/')->with('msg', '🌿 Crop added to wishlist successfully.');
+        return back()->with('msg', '🌿 Crop added to your wishlist successfully!');
     }
 
     /**

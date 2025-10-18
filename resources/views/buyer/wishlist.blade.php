@@ -26,7 +26,7 @@
 
     <div class="row g-4">
         @foreach($wishlists as $wishlist)
-        @php($crop = App\Models\crop_import::where('id', $wishlist->crop_id)->first())
+        @php($crop = App\Models\CropImport::where('id', $wishlist->crop_id)->first())
 
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="agro-card">

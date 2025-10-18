@@ -7,7 +7,13 @@
         .hero-caption {
             max-width: 680px;
         }
-
+        .favorite-btn {
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .favorite-btn:hover {
+            transform: scale(1.2);
+            color: #dc3545 !important;
+        }
         .market-card .card-body {
             min-height: 150px;
         }
@@ -144,8 +150,24 @@
                                 <img src="{{ asset($crop->crop_image ?: 'final_eagri/img/placeholder.jpg') }}"
                                     class="card-img-top" alt="{{ $crop->crop_name }}" loading="lazy">
                                 <div class="position-absolute top-0 end-0 m-2">
-                                    <button class="favorite-btn border-0" data-id="{{ $crop->id }}"
-                                        title="Add to wishlist"><i class="far fa-heart"></i></button>
+                                    @if (Session::has('c_username'))
+                                        <form action="{{ route('wishlist_db', ['id' => $crop->id]) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            <button type="submit"
+                                                class="favorite-btn border-0 bg-transparent text-danger"
+                                                title="Add to wishlist">
+                                                <i class="far fa-heart fa-lg"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        {{-- Guest: hide or show disabled heart --}}
+                                        <button type="button"
+                                            class="favorite-btn border-0 bg-transparent text-secondary opacity-50"
+                                            title="Login to add to wishlist" disabled>
+                                            <i class="far fa-heart fa-lg"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                             <div class="card-body">
@@ -319,7 +341,8 @@
                             try {
                                 io.unobserve(c);
                             } catch (e) {
-                                /* ignore */ }
+                                /* ignore */
+                            }
                         }
                     }
                 });

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Models\Bid_message;
-use App\Models\Crop_import;
+use App\Models\CropImport;
 use App\Models\Farmer_register;
 use App\Models\User_register;
 use App\Models\PayConfirmMessage;
@@ -17,7 +17,7 @@ class FarmerController extends Controller
      */
     public function f_home()
     {
-        $crops = Crop_import::where('username', Session::get('f_username'))->paginate(10);
+        $crops = CropImport::where('username', Session::get('f_username'))->paginate(10);
         return view('farmer.index', compact('crops'));
     }
 
@@ -26,7 +26,7 @@ class FarmerController extends Controller
         $query = $request->input('query', ''); // default to empty
         $username = Session::get('f_username');
 
-        $crops = Crop_import::where('username', $username)
+        $crops = CropImport::where('username', $username)
             ->when($query != '', function ($q) use ($query) {
                 $q->where(function ($sub) use ($query) {
                     $sub->whereRaw('LOWER(crop_name) LIKE ?', ['%' . strtolower($query) . '%'])
@@ -65,6 +65,43 @@ class FarmerController extends Controller
         return view('farmer.confirm_form', compact('bid'))
             ->with('msg', 'Payment Confirm successfully');
     }
+    public function confirmPayment(Request $request, $id)
+{
+    $bid = Bid_message::findOrFail($id);
+    $request->validate([
+        'account_id'    => ['required', 'regex:/^((01|8801)[3456789]\d{8})$/'],
+        'account_type'  => 'required|string|max:50',
+        'confirm_price' => 'required|numeric|min:1',
+        'message'       => 'nullable|string|max:255',
+    ]);
+    // Save payment confirmation
+    $confirm = new PayConfirmMessage();
+    $confirm->f_username = Session::get('f_username');
+    $confirm->cust_username = $bid->cust_username;
+    $confirm->crop_id = $bid->crop_id;
+    $confirm->bid_message_id = $bid->id;
+    $confirm->crop_name       = $bid->crop_name;
+    $confirm->account_type    = $request->input('account_type');
+    $confirm->account_id      = $request->input('account_id');
+    $confirm->confirm_price   = $request->input('confirm_price'); 
+    $confirm->message = $request->input('message');
+    $confirm->save();
+
+    // Close the crop’s bidding
+    $crop = CropImport::find($bid->crop_id);
+    if ($crop) {
+        $crop->Action = 'Unpublished'; // mark bidding as closed
+        $crop->save();
+    }
+
+    // Deactivate other bids for that crop
+    Bid_message::where('crop_id', $bid->crop_id)
+        ->where('id', '!=', $bid->id)
+        ->update(['status' => 'inactive']);
+
+    return redirect()->route('confirm_crops')
+        ->with('msg', 'Payment confirmed and bidding closed for this crop.');
+}
 
     /**
      * List all confirmed crops
@@ -93,7 +130,7 @@ class FarmerController extends Controller
     public function fa_profile($f_username)
     {
         $user = Farmer_register::where('username', $f_username)->firstOrFail(); // single model
-        $crops = Crop_import::where('username', $f_username)
+        $crops = CropImport::where('username', $f_username)
             ->where('Action', '!=', 'deleted')
             ->get();
 

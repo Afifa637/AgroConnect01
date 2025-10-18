@@ -105,5 +105,4 @@ class BuyerController extends Controller
         Session::forget('c_username');
         return redirect('/')->with('l_msg', 'Logout successfully');
     }
-    
 }

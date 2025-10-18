@@ -55,7 +55,7 @@
 
     <div class="row g-4">
         @foreach($crops as $crop)
-            @php($crop = App\Models\crop_import::where('id', $crop->crop_id)->first())
+            @php($crop = App\Models\CropImport::where('id', $crop->crop_id)->first())
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="card agri-card h-100">
                     <img src="{{ asset($crop->crop_image) }}" class="card-img-top" alt="crop" style="height:220px; object-fit:cover;">
@@ -68,9 +68,12 @@
                         <div class="d-grid gap-2 mt-3">
                             <a href="{{ route('crop_details',['id'=>$crop->id]) }}" class="btn btn-agri">View Details</a>
                             <a href="{{ route('Bid_model',['id'=>$crop->id]) }}" class="btn btn-outline-success">Bid Now</a>
-                            <a href="{{ route('wishlist_db',['id'=>$crop->id]) }}" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Add to wishlist">
-                                <i class="far fa-heart"></i>
-                            </a>
+                            <form method="POST" action="{{ route('wishlist_db', ['id' => '__ID__']) }}" class="wishlist-form d-inline">
+                                @csrf
+                                <button type="submit" class="favorite-btn border-0" title="Add to wishlist">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </form>                            
                         </div>
                     </div>
                 </div>

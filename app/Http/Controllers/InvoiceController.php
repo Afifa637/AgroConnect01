@@ -6,7 +6,7 @@ use App\Models\Bid_message;
 use App\Models\user_register;
 use App\Models\farmer_register;
 use App\Models\order;
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\PayConfirmMessage;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -34,7 +34,7 @@ class InvoiceController extends Controller
     public function order_download_invoice($id)
     {
         $order = order::findOrFail($id);
-        $crop = crop_import::where('id', $order->crop_id)->first();
+        $crop = CropImport::where('id', $order->crop_id)->first();
     
         // ✅ Corrected path to the Blade file
         $pdf = Pdf::loadView('farmer.order_download_invoice', [

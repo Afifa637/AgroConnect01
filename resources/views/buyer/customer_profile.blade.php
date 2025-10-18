@@ -48,7 +48,7 @@
     @else
         <div class="row g-4">
             @foreach($bids_crop as $crop)
-                @php($crop = App\Models\crop_import::where('id', $crop->crop_id)->first())
+                @php($crop = App\Models\CropImport::where('id', $crop->crop_id)->first())
                 <div class="col-lg-4 col-md-6">
                     <div class="card agri-card h-100">
                         <img src="{{ asset($crop['crop_image']) }}" alt="{{ $crop['crop_name'] }}" class="card-img-top" style="height:200px; object-fit:cover;">

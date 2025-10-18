@@ -34,47 +34,51 @@
                 @csrf
                 <input type="hidden" name="c_username" value="{{ Session::get('c_username') }}">
                 <input type="hidden" name="crop_id" value="{{ $confirms->crop_id }}">
-            
+
                 <div class="mb-3">
                     <label>Your Name</label>
-                    <input type="text" name="customer_name" value="{{ old('customer_name') }}" class="form-control" required>
+                    <input type="text" name="customer_name" value="{{ old('customer_name') }}" class="form-control"
+                        required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Your Email</label>
-                    <input type="email" name="customer_email" value="{{ old('customer_email') }}" class="form-control" required>
+                    <input type="email" name="customer_email" value="{{ old('customer_email') }}" class="form-control"
+                        required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Your Mobile</label>
-                    <input type="text" name="customer_mobile" value="{{ old('customer_mobile') }}" class="form-control" required>
+                    <input type="text" name="customer_mobile" value="{{ old('customer_mobile') }}" class="form-control"
+                        required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Bid Price</label>
-                    <input type="number" name="bid_price" value="{{ $confirms->confirm_price }}" class="form-control" readonly>
+                    <input type="number" name="bid_price" value="{{ $confirms->confirm_price }}" class="form-control"
+                        readonly>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Payment Amount</label>
                     <input type="number" name="pay_amount" class="form-control" required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Address</label>
                     <input type="text" name="address" class="form-control" required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Division</label>
                     <input type="text" name="division" class="form-control" required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Zip Code</label>
                     <input type="text" name="zip" class="form-control" required>
                 </div>
-            
+
                 <div class="mb-3">
                     <label>Transaction ID</label>
                     <input type="text" name="transaction_id" class="form-control" required>

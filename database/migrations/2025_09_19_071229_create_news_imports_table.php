@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('news_imports', function (Blueprint $table) {
             $table->increments('id');
             $table->string('username');
-            $table->string('news_name',20);
-            $table->string('news_description',50);
-            $table->string('long_description',255);
-            $table->string('news_image',50);
+            $table->string('news_name',150);
+            $table->text('long_description');
+            $table->text('news_description');            
+            $table->string('news_image',150);
             $table->timestamps();
 
             $table->foreign('username')->references('username')->on('admin_registers')->onDelete('cascade');

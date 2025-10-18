@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\news_info;
 use App\Models\categories_info;
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\ContactMessage;
 use App\Models\Bid_message;
 use App\Models\farmer_register;
@@ -19,7 +19,7 @@ class HomeController extends Controller
     {
         $date = Carbon::now();
         // Update old crops based on bidding date
-        $allCrops = crop_import::all();
+        $allCrops = CropImport::all();
         foreach ($allCrops as $crop) {
             if ($date->greaterThan($crop->last_date_bidding)) {
                 if ($crop->condition !== 'old') {
@@ -31,21 +31,21 @@ class HomeController extends Controller
 
         $categories = categories_info::where('categories_status', 1)->get();
         $latestNews = news_info::latest()->take(3)->get();
-        $crops = crop_import::where('Action', 'Published')
-            ->where('status', 1)
+        $crops = CropImport::where('Action', 'Published')
+            ->where('status', "1")
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
         // featured for hero
-        $featured = crop_import::where('Action', 'Published')
-            ->where('status', 1)
+        $featured = CropImport::where('Action', 'Published')
+            ->where('status', "1")
             ->orderBy('created_at', 'desc')
             ->take(4)
             ->get();
 
         // --- Dynamic stats (counts) ---
-        $cropsCount = (int) crop_import::where('Action', 'Published')
-            ->where('status', 1)
+        $cropsCount = (int) CropImport::where('Action', 'Published')
+            ->where('status', "1")
             ->count();
 
         // Farmers registered
@@ -93,19 +93,21 @@ class HomeController extends Controller
 
     // 📰 News Page
     public function news_info()
-    {
-        $categories = categories_info::where('categories_status', 1)->get();
-        $newses = news_info::latest()->paginate(6);
-        return view('home.news_info', compact('newses', 'categories'));
-    }
+{
+    $categories = categories_info::where('categories_status', 1)->get();
+    $latestNews = news_info::orderBy('created_at', 'desc')->take(10)->get(); // add this
+    $newses = news_info::latest()->paginate(6);
+    
+    return view('home.news_info', compact('newses', 'categories', 'latestNews'));
+}
 
     // 🌾 Categories
     public function Categories($crop_type)
     {
         $category = categories_info::findOrFail($crop_type);
-        $crops = crop_import::where('crop_type', $crop_type)
+        $crops = CropImport::where('crop_type', $crop_type)
             ->where('Action', 'Published')
-            ->where('status', 1)
+            ->where('status', "1")
             ->get();
         $categories = categories_info::where('categories_status', 1)->get();
         return view('home.categories', compact('category', 'crops', 'categories'));
@@ -116,10 +118,10 @@ class HomeController extends Controller
     {
         $category = categories_info::findOrFail($crop_type);
 
-        $crops = crop_import::where('crop_type', $crop_type)
+        $crops = CropImport::where('crop_type', $crop_type)
             ->where('crop_session', $crop_session)
             ->where('Action', 'Published')
-            ->where('status', 1)
+            ->where('status', "1")
             ->get();
         $categories = categories_info::where('categories_status', 1)->get();
         return view('home.session_categories', compact('category', 'crops', 'crop_session', 'categories'));
@@ -128,10 +130,11 @@ class HomeController extends Controller
     // 🌱 Crop Details + Bids
     public function crop_details($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
+        $farmer = farmer_register::where('username', $crop->username)->first();
         $bids_msg = Bid_message::where('crop_id', $id)->get();
         $categories = categories_info::where('categories_status', 1)->get();
-        return view('home.crop_details', compact('crop', 'bids_msg', 'categories'));
+        return view('home.crop_details', compact('crop', 'bids_msg', 'categories', 'farmer'));
     }
 
     // 🔍 Search Functionality
@@ -139,7 +142,7 @@ class HomeController extends Controller
     {
         $query = $request->input('search');
 
-        $s = crop_import::where(function ($q) use ($query) {
+        $s = CropImport::where(function ($q) use ($query) {
             $q->where('crop_name', 'like', "%$query%")
                 ->orWhere('crop_description', 'like', "%$query%")
                 ->orWhere('crop_location', 'like', "%$query%")
@@ -157,8 +160,8 @@ class HomeController extends Controller
     {
         $q = $request->query('query', '');
         if (strlen($q) < 1) return response()->json([]);
-        $items = crop_import::where('crop_name', 'like', "%{$q}%")
-            ->where('Action', 'Published')->where('status', 1)
+        $items = CropImport::where('crop_name', 'like', "%{$q}%")
+            ->where('Action', 'Published')->where('status', "1")
             ->limit(8)->pluck('crop_name');
         return response()->json($items);
     }
@@ -191,4 +194,27 @@ class HomeController extends Controller
         return redirect()->to(route('contact') . '#contact')
             ->with('contact_success', 'Thanks! Your message has been received. We will contact you soon.');
     }
+
+    public function news_page()
+    {
+        // Fetch latest 10 news for sidebar and main content
+        $latestNews = news_info::orderBy('created_at', 'desc')->take(10)->get();
+    
+        // Pass $latestNews to the view
+        return view('home.news_info', compact('latestNews'));
+    }
+    
+    // AJAX method for fetching single news (used by JS)
+    public function ajax_news($id)
+    {
+        $news = news_info::findOrFail($id);
+    
+        return response()->json([
+            'news_name' => $news->news_name,
+            'news_image' => asset($news->news_image),
+            'long_description' => $news->long_description,
+            'created_at' => $news->created_at->format('d M Y'),
+        ]);
+    }    
+
 }

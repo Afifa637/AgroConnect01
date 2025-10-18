@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bid_message;
-use App\Models\crop_import;
+use App\Models\CropImport;
 use App\Models\farmer_register;
 use App\Models\user_register;
 use App\Models\PayConfirmMessage;
@@ -17,7 +17,7 @@ class BidController extends Controller
      */
     public function Bid_model($id)
     {
-        $crop = crop_import::findOrFail($id);
+        $crop = CropImport::findOrFail($id);
         $highestBid = Bid_message::where('crop_id', $id)->max('bid_price');
 
         return view('buyer.Bid_model', [
@@ -104,7 +104,7 @@ class BidController extends Controller
         $bid = Bid_message::findOrFail($id);
         $bid->delete();
 
-        $crop = crop_import::findOrFail($crop_id);
+        $crop = CropImport::findOrFail($crop_id);
         $bids_msg = Bid_message::where('crop_id', $crop_id)->get();
 
         return view('home.crop_details', compact('crop', 'bids_msg'))
@@ -115,29 +115,32 @@ class BidController extends Controller
      * Save payment confirmation
      */
     public function pay_confirm_message(Request $request)
-    {
-        $request->validate([
-            'account_id'    => ['required', 'regex:/^((01|8801)[3456789]\d{8})$/'],
-            'crop_id'       => 'required|integer',
-            'f_username'    => 'required|string|max:50',
-            'crop_name'     => 'required|string|max:100',
-            'cust_username' => 'required|string|max:50',
-            'account_type'  => 'required|string|max:50',
-            'confirm_price' => 'required|numeric|min:1',
-            'message'       => 'nullable|string|max:255',
-        ]);
+{
+    $request->validate([
+        'bid_message_id' => 'required|integer|exists:bid_messages,id',
+        'account_id'     => ['required', 'regex:/^((01|8801)[3456789]\d{8})$/'],
+        'crop_id'        => 'required|integer',
+        'f_username'     => 'required|string|max:50',
+        'crop_name'      => 'required|string|max:100',
+        'cust_username'  => 'required|string|max:50',
+        'account_type'   => 'required|string|max:50',
+        'confirm_price'  => 'required|numeric|min:1',
+        'message'        => 'nullable|string|max:255',
+    ]);
 
-        $msg = new PayConfirmMessage();
-        $msg->crop_id       = $request->crop_id;
-        $msg->f_username    = $request->f_username;
-        $msg->crop_name     = $request->crop_name;
-        $msg->cust_username = $request->cust_username;
-        $msg->account_type  = $request->account_type;
-        $msg->account_id    = $request->account_id;
-        $msg->confirm_price = $request->confirm_price;
-        $msg->message       = $request->message ?? 'null';
-        $msg->save();
+    $msg = new PayConfirmMessage();
+    $msg->crop_id        = $request->crop_id;
+    $msg->bid_message_id = $request->bid_message_id;
+    $msg->f_username     = $request->f_username;
+    $msg->crop_name      = $request->crop_name;
+    $msg->cust_username  = $request->cust_username;
+    $msg->account_type   = $request->account_type;
+    $msg->account_id     = $request->account_id;
+    $msg->confirm_price  = $request->confirm_price;
+    $msg->message        = $request->message ?? null;
+    $msg->save();
 
-        return back()->with('msg', '💰 Payment confirmation message sent successfully.');
-    }
+    return back()->with('msg', '💰 Your confirmation message was sent successfully.');
+}
+
 }
