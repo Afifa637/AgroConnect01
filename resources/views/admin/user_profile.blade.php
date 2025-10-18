@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','User Crops')
 @section('body')
-
+<div class="container-fluid py-4">
 <style>
     .item-desc { background:#f4fbf4; padding:0.6rem; }
     .item-name { background:#2b8a3e; color:#fff; padding:8px; border-radius:4px; margin-bottom:6px; }
@@ -35,5 +35,5 @@
         @endforeach
     </div>
 </section>
-
+</div>
 @endsection

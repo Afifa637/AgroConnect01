@@ -54,7 +54,7 @@ Route::controller(HomeController::class)->group(function () {
 
     // Search
     Route::get('/search', 'search')->name('search');
-
+    Route::get('/search-autocomplete', 'searchAutocomplete')->name('search.autocomplete');
     // Contact form
     Route::post('/contact/submit', 'contactSubmit')->name('contact.submit');
 });
@@ -112,7 +112,6 @@ Route::controller(AdminLoginController::class)->group(function () {
 */
 Route::prefix('admin')->controller(AdminController::class)->group(function () {
     Route::get('/home', 'a_home')->name('a_home');
-
     // Crops
     Route::get('/published/crop', 'published_crops')->name('published_crops');
     Route::get('/crop/unpublished/{id}', 'crop_unpublished_save')->name('crop_unpublished_save');
@@ -151,6 +150,8 @@ Route::prefix('admin')->controller(AdminController::class)->group(function () {
     Route::get('user/profile/{id}', 'user_profile')->name('user_profile');
     Route::get('user/details/{id}', 'user_details')->name('user_details');
     Route::get('/search', 'admin_search')->name('admin_search');
+    Route::get('/contact-messages',  'contact_messages')->name('admin.contact_messages');
+
 });
 /*
 |--------------------------------------------------------------------------

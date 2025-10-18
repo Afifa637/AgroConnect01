@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','Manage News')
 @section('body')
-
+<div class="container-fluid py-4">
 <div class="row">
     <div class="col-12">
         <h3 class="text-agro mb-3">Manage News</h3>
@@ -49,5 +49,6 @@
             </table>
         </div>
     </div>
+</div>
 </div>
 @endsection

@@ -7,8 +7,10 @@
   <h2 class="mb-4 text-center fw-bold text-success">📩 Contact Us</h2>
 
   @if(session('contact_success'))
-    <div class="alert alert-success text-center shadow-sm">{{ session('contact_success') }}</div>
-  @endif
+    <div class="alert alert-success text-center shadow-sm rounded-pill">
+        {{ session('contact_success') }}
+    </div>
+@endif
 
   <div class="row g-4">
     <!-- Contact Form -->

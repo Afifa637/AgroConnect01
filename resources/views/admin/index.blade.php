@@ -3,6 +3,7 @@
 @section('title', 'Admin Dashboard')
 
 @section('body')
+<div class="container-fluid py-4">
 <div class="container-fluid">
     <h2 class="text-success fw-bold mb-4">Welcome, {{ Session::get('a_username') }}</h2>
 
@@ -116,4 +117,5 @@
     });
 </script>
 @endpush
+</div>
 @endsection

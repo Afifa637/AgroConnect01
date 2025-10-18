@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Http\Middleware\AdminLoginMiddleware;
+use App\Models\ContactMessage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -337,5 +338,10 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.search', ['s' => $search]);
+    }
+    public function contact_messages()
+    {
+        $messages = ContactMessage::orderBy('created_at', 'desc')->get();
+        return view('admin.contact_messages', compact('messages'));
     }
 }

@@ -2,225 +2,342 @@
 
 @section('title', 'Home')
 
+@push('head')
+    <style>
+        .hero-caption {
+            max-width: 680px;
+        }
+
+        .market-card .card-body {
+            min-height: 150px;
+        }
+    </style>
+@endpush
+
 @section('body')
+    <div class="container">
+        <!-- HERO / FEATURED CAROUSEL -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div id="heroCarousel" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @php
+                            // Use featured items if passed from controller
+                            $heroItems = $featured ?? (isset($crops) ? $crops->take(4) : collect());
+                        @endphp
 
-<!-- 🌾 HERO / CAROUSEL -->
-<div id="home-hero" class="mb-5">
-  <div id="carouselExampleIndicators" class="carousel slide rounded shadow-sm" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active position-relative">
-        <img src="{{ asset('final_eagri/img/1.jpg') }}" class="d-block w-100" alt="Slide 1">
-        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-4">
-          <h1 class="fw-bold text-white">Connecting Farmers & Buyers</h1>
-          <p>Bringing technology and trust to agriculture trade</p>
-          <a href="{{ route('signup') }}" class="btn btn-success btn-lg mt-2">Join Now</a>
-        </div>
-      </div>
-      <div class="carousel-item position-relative">
-        <img src="{{ asset('final_eagri/img/2.jpg') }}" class="d-block w-100" alt="Slide 2">
-        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-4">
-          <h1 class="fw-bold text-white">Empowering Farmers</h1>
-          <p>Fair prices, no middlemen, more profits</p>
-        </div>
-      </div>
-      <div class="carousel-item position-relative">
-        <img src="{{ asset('final_eagri/img/3.jpg') }}" class="d-block w-100" alt="Slide 3">
-        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-4">
-          <h1 class="fw-bold text-white">Fresh Crops for Buyers</h1>
-          <p>Access quality products directly from farms</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                        @if ($heroItems && $heroItems->count())
+                            @foreach ($heroItems as $k => $item)
+                                <div class="carousel-item {{ $k == 0 ? 'active' : '' }} position-relative">
+                                    <img src="{{ asset($item->crop_image ?? 'final_eagri/img/1.jpg') }}" class="d-block w-100"
+                                        alt="{{ $item->crop_name }}" loading="lazy" style="height:420px; object-fit:cover;">
+                                    <div class="carousel-caption d-none d-md-block hero-overlay p-4 rounded">
+                                        <div class="hero-caption text-start">
+                                            <h2 class="fw-bold text-white">{{ Str::limit($item->crop_name, 48) }}</h2>
+                                            <p class="text-white small">{{ Str::limit($item->crop_description, 140) }}</p>
+                                            <div class="d-flex gap-2">
+                                                <a href="{{ route('crop_details', ['id' => $item->id]) }}"
+                                                    class="btn btn-success btn-lg">View Crop</a>
+                                                <a href="{{ route('signup') }}"
+                                                    class="btn btn-outline-light btn-lg">Join</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <!-- fallback static slides -->
+                            <div class="carousel-item active">
+                                <img src="{{ asset('final_eagri/img/1.jpg') }}" class="d-block w-100" alt="Slide 1"
+                                    style="height:420px; object-fit:cover;">
+                                <div class="carousel-caption d-none d-md-block hero-overlay rounded p-4">
+                                    <h1 class="fw-bold text-white">Connecting Farmers & Buyers</h1>
+                                    <p class="text-white">Bringing technology and trust to agriculture trade</p>
+                                    <a href="{{ route('signup') }}" class="btn btn-success btn-lg">Join Now</a>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
 
-<!-- 🌱 ABOUT + LATEST NEWS -->
-<section id="about" class="py-5 bg-white">
-  <div class="container">
-    <div class="row align-items-center g-4">
-      <div class="col-lg-6">
-        <h2 class="fw-bold text-success">About AgroConnect</h2>
-        <p class="lead">We connect farmers and buyers directly — removing barriers and empowering agriculture.</p>
-        <p>Our platform enables listing, bidding, and secure trade with tools tailored for farmers and buyers.</p>
-        <a class="btn btn-success mt-3" href="{{ route('about') }}">Learn More</a>
-      </div>
-      <div class="col-lg-6">
-        @if(isset($latestNews) && $latestNews->count())
-          <h5 class="fw-bold mb-3">🌾 Latest News</h5>
-          <div class="row g-3">
-            @foreach($latestNews as $news)
-              <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                  <img src="{{ asset($news->news_image) }}" class="card-img-top" alt="">
-                  <div class="card-body">
-                    <h6 class="fw-bold">{{ Str::limit($news->news_name, 40) }}</h6>
-                    <p class="small text-muted">{{ Str::limit($news->news_description, 60) }}</p>
-                  </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
-              </div>
-            @endforeach
-          </div>
-          <div class="mt-3">
-            <a href="{{ route('news_info') }}" class="btn btn-outline-success btn-sm">View All News</a>
-          </div>
-        @endif
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 🌟 FEATURES / SERVICES -->
-<section id="services" class="py-5 bg-light">
-  <div class="container">
-    <h2 class="mb-4 text-center fw-bold">Our Services</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card h-100 shadow border-0 text-center p-4">
-          <i class="fas fa-seedling fa-3x text-success mb-3"></i>
-          <h5 class="fw-bold">Crop Marketplace</h5>
-          <p>Farmers list produce, buyers bid — transparent and fair.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 shadow border-0 text-center p-4">
-          <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
-          <h5 class="fw-bold">Farmer Support</h5>
-          <p>Guidance on pricing, selling, and expanding market reach.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 shadow border-0 text-center p-4">
-          <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
-          <h5 class="fw-bold">Secure Bids</h5>
-          <p>Safe bidding process with verified farmers and buyers.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 📊 STATS / COUNTERS -->
-<section class="py-5 text-white" style="background: url('{{ asset('final_eagri/img/crop.jpg') }}') center/cover no-repeat fixed;">
-  <div class="container text-center">
-    <div class="row g-4">
-      <div class="col-md-3">
-        <h2 class="fw-bold counter" data-target="5000">0</h2>
-        <p>Farmers Registered</p>
-      </div>
-      <div class="col-md-3">
-        <h2 class="fw-bold counter" data-target="10000">0</h2>
-        <p>Crops Listed</p>
-      </div>
-      <div class="col-md-3">
-        <h2 class="fw-bold counter" data-target="3000">0</h2>
-        <p>Verified Buyers</p>
-      </div>
-      <div class="col-md-3">
-        <h2 class="fw-bold counter" data-target="15">0</h2>
-        <p>Categories</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 🗣️ TESTIMONIALS -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="fw-bold text-center mb-5">What Farmers Say</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card shadow h-100 text-center p-4">
-          <p class="text-muted">"AgroConnect helped me sell directly to buyers, no middlemen, better profits!"</p>
-          <h6 class="fw-bold mt-3">— Abdul, Farmer</h6>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow h-100 text-center p-4">
-          <p class="text-muted">"The platform is easy to use and transparent. I trust AgroConnect."</p>
-          <h6 class="fw-bold mt-3">— Rafiq, Buyer</h6>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow h-100 text-center p-4">
-          <p class="text-muted">"I expanded my reach and found loyal customers. Highly recommend!"</p>
-          <h6 class="fw-bold mt-3">— Fatema, Farmer</h6>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 📰 LATEST NEWS -->
-<section id="latest-news" class="py-5">
-  <div class="container">
-    <h2 class="mb-4 text-center fw-bold">Latest News</h2>
-    <div class="row g-4">
-      @forelse($latestNews as $news)
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm">
-            <img src="{{ asset($news->news_image) }}" class="card-img-top" alt="News Image">
-            <div class="card-body">
-              <h6 class="fw-bold">{{ Str::limit($news->news_name, 50) }}</h6>
-              <p class="small text-muted">{{ Str::limit($news->news_description, 80) }}</p>
-              <a href="{{ route('news_info') }}" class="btn btn-outline-success btn-sm">Read More</a>
             </div>
-          </div>
+
+            <!-- Quick Actions / Highlights -->
+            <div class="col-lg-4">
+                <div class="card card-ghost shadow-sm h-100 p-3">
+                    <h5 class="fw-bold">Quick Actions</h5>
+                    <p class="small text-muted">Get started quickly — list crops, browse verified farmers and bid securely.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('signup') }}" class="btn btn-success">Create Account</a>
+                        <a href="{{ route('services') }}" class="btn btn-outline-success">How it Works</a>
+                        <a href="{{ route('news_info') }}" class="btn btn-light border">Latest News</a>
+                    </div>
+                    <hr>
+                    <div class="mt-2">
+                        <h6 class="small text-muted">Verified Farmers</h6>
+                        <div class="d-flex gap-2 mt-2">
+                            @foreach (App\Models\farmer_register::inRandomOrder()->take(4)->get() as $f)
+                                <a href="#" class="text-decoration-none text-dark" title="{{ $f->username }}">
+                                    <img src="{{ asset($f->profile_photo ?? 'final_eagri/img/agri.png') }}" width="44"
+                                        height="44" class="rounded-circle border" alt="{{ $f->username }}">
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      @empty
-        <p class="text-center">No news available.</p>
-      @endforelse
+
+        <!-- SERVICES / FEATURE ROW -->
+        <section class="mb-5">
+            <div class="container">
+                <h3 class="fw-bold text-center mb-4">How AgroConnect Helps</h3>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm text-center p-4">
+                            <i class="fas fa-seedling fa-3x text-success mb-3"></i>
+                            <h5 class="fw-bold">Crop Marketplace</h5>
+                            <p class="small text-muted">List produce with images and bidding tools.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm text-center p-4">
+                            <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
+                            <h5 class="fw-bold">Farmer Support</h5>
+                            <p class="small text-muted">Guidance on pricing, listing and shipping.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm text-center p-4">
+                            <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+                            <h5 class="fw-bold">Secure Bids</h5>
+                            <p class="small text-muted">Transparent bidding and confirmation flows.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MARKETPLACE GRID -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold">Latest Crops</h4>
+                <a href="{{ route('categories', ['crop_type' => 0]) }}" class="small text-decoration-none">View All →</a>
+            </div>
+
+            <div class="row g-4">
+                @forelse($crops as $crop)
+                    <div class="col-md-4">
+                        <div class="card crop-card shadow-sm">
+                            <div class="position-relative">
+                                <img src="{{ asset($crop->crop_image ?: 'final_eagri/img/placeholder.jpg') }}"
+                                    class="card-img-top" alt="{{ $crop->crop_name }}" loading="lazy">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <button class="favorite-btn border-0" data-id="{{ $crop->id }}"
+                                        title="Add to wishlist"><i class="far fa-heart"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="fw-bold">{{ Str::limit($crop->crop_name, 48) }}</h6>
+                                <p class="small text-muted mb-2">{{ Str::limit($crop->crop_description, 90) }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="small text-muted">From: {{ $crop->crop_location }}</div>
+                                        <div class="fw-semibold">{{ $crop->bid_rate }} TK</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <a href="{{ route('crop_details', ['id' => $crop->id]) }}"
+                                            class="btn btn-outline-success btn-sm">Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer small text-muted d-flex justify-content-between">
+                                <div>Posted: {{ $crop->created_at->diffForHumans() }}</div>
+                                <div>{{ $crop->condition == 'old' ? 'Completed' : 'Open' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12 text-center text-muted">No crops found.</div>
+                @endforelse
+            </div>
+
+            <!-- pagination -->
+            <div class="mt-4 d-flex justify-content-center">
+                {{ $crops->links('pagination::bootstrap-5') }}
+            </div>
+        </section>
+
+        <!-- STATISTICS (COUNTERS) -->
+        <section class="py-5 mb-5 rounded"
+            style="background:url('{{ asset('final_eagri/img/crop.jpg') }}') center/cover no-repeat fixed;">
+            <div class="container text-white text-center py-5" style="background:rgba(0,0,0,0.35); border-radius:8px;">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h2 class="fw-bold counter" data-target="{{ (int) ($farmersCount ?? 0) }}">
+                            {{ number_format((int) ($farmersCount ?? 0)) }}</h2>
+                        <div>Farmers Registered</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h2 class="fw-bold counter" data-target="{{ (int) ($cropsCount ?? 0) }}">
+                            {{ number_format((int) ($cropsCount ?? 0)) }}</h2>
+                        <div>Crops Listed</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h2 class="fw-bold counter" data-target="{{ (int) ($buyersCount ?? 0) }}">
+                            {{ number_format((int) ($buyersCount ?? 0)) }}</h2>
+                        <div>Verified Buyers</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h2 class="fw-bold counter" data-target="{{ (int) ($categoriesCount ?? 0) }}">
+                            {{ number_format((int) ($categoriesCount ?? 0)) }}</h2>
+                        <div>Categories</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LATEST NEWS -->
+        <section class="mb-5">
+            <h4 class="fw-bold mb-3">Latest News</h4>
+            <div class="row g-3">
+                @foreach ($latestNews as $news)
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <img loading="lazy" src="{{ asset($news->news_image) }}" class="card-img-top"
+                                alt="{{ $news->news_name }}">
+                            <div class="card-body">
+                                <h6 class="fw-bold">{{ Str::limit($news->news_name, 60) }}</h6>
+                                <p class="small text-muted">{{ Str::limit($news->news_description, 100) }}</p>
+                                <a href="{{ route('news_info') }}" class="btn btn-outline-success btn-sm">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section class="mb-5">
+            <h4 class="fw-bold text-center mb-4">What Farmers Say</h4>
+            <div id="testimonials" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="card shadow-sm p-4">
+                            <p class="text-muted">"AgroConnect helped me sell directly to buyers, no middlemen, better
+                                profits!"</p>
+                            <div class="fw-bold mt-2">— Abdul, Farmer</div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="card shadow-sm p-4">
+                            <p class="text-muted">"The platform is easy to use and transparent. I trust AgroConnect."</p>
+                            <div class="fw-bold mt-2">— Rafiq, Buyer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    <div class="text-center mt-4">
-      <a href="{{ route('news_info') }}" class="btn btn-success">View All News</a>
-    </div>
-  </div>
-</section>
 
-<!-- 🌟 CTA BANNER -->
-<section class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)), url('{{ asset('final_eagri/img/service.jpg') }}') center/cover fixed;">
-  <div class="container">
-    <h2 class="fw-bold mb-3">Join AgroConnect Today</h2>
-    <p class="lead">Empower your farming journey, connect with buyers, and grow your business.</p>
-    <a href="{{ route('signup') }}" class="btn btn-success btn-lg">Get Started</a>
-  </div>
-</section>
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const counters = Array.from(document.querySelectorAll('.counter'));
+                if (!counters.length) return;
 
-<!-- ✅ Counter Animation Script -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const counters = document.querySelectorAll(".counter");
-    const speed = 150; // lower is faster
+                // Helper to animate a single counter element from 0 -> target
+                const animateCounter = (el) => {
+                    const target = parseInt(el.getAttribute('data-target') || '0', 10);
+                    if (!Number.isFinite(target) || target <= 0) {
+                        // If target is zero or invalid, ensure visible content is 0
+                        el.innerText = (target === 0) ? '0' : el.innerText;
+                        return;
+                    }
 
-    const animateCounters = () => {
-      counters.forEach(counter => {
-        const updateCount = () => {
-          const target = +counter.getAttribute("data-target");
-          const count = +counter.innerText;
+                    // Start from 0 in DOM for animation clarity
+                    let start = 0;
+                    el.innerText = '0';
 
-          const increment = Math.ceil(target / speed);
+                    // Determine step and duration (make shorter for small numbers)
+                    const duration = 1200; // total animation duration in ms
+                    const frameRate = 60;
+                    const totalFrames = Math.round((duration / 1000) * frameRate);
+                    const increment = Math.max(1, Math.floor(target / totalFrames));
 
-          if (count < target) {
-            counter.innerText = count + increment;
-            setTimeout(updateCount, 30);
-          } else {
-            counter.innerText = target.toLocaleString();
-          }
-        };
-        updateCount();
-      });
-    };
+                    let current = 0;
+                    const tick = () => {
+                        current += increment;
+                        if (current < target) {
+                            el.innerText = current.toLocaleString();
+                            requestAnimationFrame(tick);
+                        } else {
+                            el.innerText = target.toLocaleString();
+                        }
+                    };
+                    requestAnimationFrame(tick);
+                };
 
-    // Run animation only once when section is visible
-    let executed = false;
-    window.addEventListener("scroll", () => {
-      const section = document.querySelector("#latest-news");
-      const statsSection = document.querySelector(".counter").closest("section");
-      if (!executed && statsSection.getBoundingClientRect().top < window.innerHeight) {
-        animateCounters();
-        executed = true;
-      }
-    });
-  });
-</script>
+                // IntersectionObserver: animate each counter when visible (once)
+                const io = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            animateCounter(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.25
+                });
 
+                // Observe each counter
+                counters.forEach(c => io.observe(c));
+
+                // ALSO: if any counters are already in view (no scrolling), start them immediately
+                // (useful for short pages or when counters are near top)
+                counters.forEach(c => {
+                    const rect = c.getBoundingClientRect();
+                    if (rect.top >= 0 && rect.top < window.innerHeight) {
+                        // If still observed, we trigger animation manually
+                        // (IntersectionObserver callback might not fire if element already intersected)
+                        if (c.getAttribute('data-target')) {
+                            animateCounter(c);
+                            try {
+                                io.unobserve(c);
+                            } catch (e) {
+                                /* ignore */ }
+                        }
+                    }
+                });
+            });
+
+            // Wishlist button placeholder (AJAX hook)
+            document.addEventListener('click', (e) => {
+                const fav = e.target.closest('.favorite-btn');
+                if (!fav) return;
+                e.preventDefault();
+
+                const id = fav.dataset.id;
+                if (!id) return;
+
+                // If user must be logged in, your controller will handle redirect to login.
+                // This is simple and safe because it uses your existing route definitions.
+                window.location.href = '{{ url('/customer/wishlist/save') }}/' + encodeURIComponent(id);
+            });
+        </script>
+    @endpush
 @endsection

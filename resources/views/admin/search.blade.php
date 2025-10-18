@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','Search Results')
 @section('body')
-
+<div class="container-fluid py-4">
 <h3 class="text-agro mb-3">Search Results</h3>
 
 @if($s->isEmpty())
@@ -34,5 +34,5 @@
         @endforeach
     </div>
 </section>
-
+</div>
 @endsection

@@ -8,19 +8,69 @@ use App\Models\categories_info;
 use App\Models\crop_import;
 use App\Models\ContactMessage;
 use App\Models\Bid_message;
+use App\Models\farmer_register;
+use App\Models\user_register;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-    // Homepage
+    // 🏠 Homepage
     public function index()
     {
+        $date = Carbon::now();
+        // Update old crops based on bidding date
+        $allCrops = crop_import::all();
+        foreach ($allCrops as $crop) {
+            if ($date->greaterThan($crop->last_date_bidding)) {
+                if ($crop->condition !== 'old') {
+                    $crop->condition = "old";
+                    $crop->save();
+                }
+            }
+        }
+
         $categories = categories_info::where('categories_status', 1)->get();
         $latestNews = news_info::latest()->take(3)->get();
-        $crops = crop_import::latest()->take(12)->get();
-        return view('home.index', compact('categories', 'latestNews', 'crops'));
+        $crops = crop_import::where('Action', 'Published')
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        // featured for hero
+        $featured = crop_import::where('Action', 'Published')
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+
+        // --- Dynamic stats (counts) ---
+        $cropsCount = (int) crop_import::where('Action', 'Published')
+            ->where('status', 1)
+            ->count();
+
+        // Farmers registered
+        $farmersCount = (int) farmer_register::count();
+
+        // Verified buyers / users
+        $buyersCount = (int) user_register::count();
+
+        // Active categories
+        $categoriesCount = (int) categories_info::where('categories_status', 1)->count();
+
+        // pass to view (your existing compact call — ensure all names are included)
+        return view('home.index', compact(
+            'categories',
+            'latestNews',
+            'crops',
+            'featured',
+            'cropsCount',
+            'farmersCount',
+            'buyersCount',
+            'categoriesCount'
+        ));
     }
 
-    // Static Pages
+    // ℹ️ Static Pages
     public function about()
     {
         return view('home.about_us');
@@ -41,79 +91,104 @@ class HomeController extends Controller
         return view('home.gallery');
     }
 
-    // News Page
+    // 📰 News Page
     public function news_info()
     {
+        $categories = categories_info::where('categories_status', 1)->get();
         $newses = news_info::latest()->paginate(6);
-        return view('home.news_info', compact('newses'));
+        return view('home.news_info', compact('newses', 'categories'));
     }
 
-    // Categories
+    // 🌾 Categories
     public function Categories($crop_type)
     {
         $category = categories_info::findOrFail($crop_type);
-        $crops = crop_import::where('crop_type', $crop_type)->get();
-        return view('home.categories', compact('category', 'crops'));
+        $crops = crop_import::where('crop_type', $crop_type)
+            ->where('Action', 'Published')
+            ->where('status', 1)
+            ->get();
+        $categories = categories_info::where('categories_status', 1)->get();
+        return view('home.categories', compact('category', 'crops', 'categories'));
     }
 
-    // Session Categories
+    // 🕒 Seasonal Categories
     public function Session_Categories($crop_type, $crop_session)
     {
         $category = categories_info::findOrFail($crop_type);
+
         $crops = crop_import::where('crop_type', $crop_type)
-                      ->where('crop_session', $crop_session)
-                      ->get();
-        return view('home.session_categories', compact('category', 'crops', 'crop_session'));
+            ->where('crop_session', $crop_session)
+            ->where('Action', 'Published')
+            ->where('status', 1)
+            ->get();
+        $categories = categories_info::where('categories_status', 1)->get();
+        return view('home.session_categories', compact('category', 'crops', 'crop_session', 'categories'));
     }
 
-    // Crop Details
+    // 🌱 Crop Details + Bids
     public function crop_details($id)
     {
         $crop = crop_import::findOrFail($id);
         $bids_msg = Bid_message::where('crop_id', $id)->get();
-        return view('home.crop_details', compact('crop', 'bids_msg'));
+        $categories = categories_info::where('categories_status', 1)->get();
+        return view('home.crop_details', compact('crop', 'bids_msg', 'categories'));
     }
 
-    // Search
+    // 🔍 Search Functionality
     public function search(Request $request)
     {
         $query = $request->input('search');
-    
-        $s = Crop_import::where('crop_name', 'like', "%$query%")
-            ->orWhere('crop_description', 'like', "%$query%")
-            ->orWhere('crop_location', 'like', "%$query%")
-            ->get();
-    
-        return view('home.search', compact('s'));
-    }    
 
-    // Login Page
+        $s = crop_import::where(function ($q) use ($query) {
+            $q->where('crop_name', 'like', "%$query%")
+                ->orWhere('crop_description', 'like', "%$query%")
+                ->orWhere('crop_location', 'like', "%$query%")
+                ->orWhere('crop_type', 'like', "%$query%");
+        })
+            ->where('Action', 'Published')
+            ->where('status', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+        $categories = categories_info::where('categories_status', 1)->get();
+        return view('home.search', compact('s', 'categories'));
+    }
+    // AUTOCOMPLETE endpoint used by header JS
+    public function searchAutocomplete(Request $request)
+    {
+        $q = $request->query('query', '');
+        if (strlen($q) < 1) return response()->json([]);
+        $items = crop_import::where('crop_name', 'like', "%{$q}%")
+            ->where('Action', 'Published')->where('status', 1)
+            ->limit(8)->pluck('crop_name');
+        return response()->json($items);
+    }
+    // 🔐 Login Page
     public function login()
     {
         return view('home.login');
     }
 
-    // Signup Page
+    // 📝 Signup Page
     public function signup()
     {
         return view('home.signup');
     }
 
-    // Contact form handler
+    // 📬 Contact Form Submission
     public function contactSubmit(Request $request)
     {
         $validated = $request->validate([
             'name'    => 'required|string|max:191',
             'email'   => 'required|email|max:191',
             'phone'   => 'nullable|string|max:40',
+            'subject' => 'required|string|max:191', 
             'message' => 'required|string|max:5000',
         ]);
 
         // Save to DB
         ContactMessage::create($validated);
 
-        // Redirect back to home contact section with success flash
-        return redirect()->to(route('home') . '#contact')
-                         ->with('contact_success', 'Thanks! Your message has been received. We will contact you soon.');
+        return redirect()->to(route('contact') . '#contact')
+            ->with('contact_success', 'Thanks! Your message has been received. We will contact you soon.');
     }
 }

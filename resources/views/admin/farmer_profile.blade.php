@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','Farmer Profile')
 @section('body')
-
+<div class="container-fluid py-4">
 <style>
     /* small card tweaks for agro theme */
     .item-desc { background: #f4fbf4; padding: 0.5rem; }
@@ -33,5 +33,5 @@
         @endforeach
     </div>
 </section>
-
+</div>
 @endsection

@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','Deleted Crops')
 @section('body')
-
+<div class="container-fluid py-4">
 <h5 class="text-center text-success mb-3">{{ Session::get('msg') }}</h5>
 
 <div class="row">
@@ -26,5 +26,5 @@
         </div>
     @endforeach
 </div>
-
+</div>
 @endsection

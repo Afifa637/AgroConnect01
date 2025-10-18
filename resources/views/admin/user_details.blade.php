@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','User Details')
 @section('body')
-
+<div class="container-fluid py-4">
 <div class="container my-5">
     <main>
         <div class="other-section">
@@ -53,5 +53,5 @@
         </div>
     </main>
 </div>
-
+</div>
 @endsection

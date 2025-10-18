@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','All Farmers')
 @section('body')
-
+<div class="container-fluid py-4">
 <div class="row">
     <div class="col-12">
         <h3 class="text-agro text-center mb-3">Manage Farmers</h3>
@@ -69,5 +69,5 @@
         </div>
     </div>
 </div>
-
+</div>
 @endsection

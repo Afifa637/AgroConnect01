@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','News & Announcements')
 @section('body')
-
+<div class="container-fluid py-4">
 <h2 class="text-agro mb-4">News & Announcements</h2>
 
 <div class="row">
@@ -23,5 +23,5 @@
         </div>
     @endforeach
 </div>
-
+</div>
 @endsection

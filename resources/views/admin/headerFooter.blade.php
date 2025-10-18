@@ -145,6 +145,9 @@
         <a href="{{ route('all_customer') }}" class="{{ request()->routeIs('all_customer') ? 'active' : '' }}">
             <i class="bi bi-people"></i> All Buyers
         </a>
+        <a href="{{ route('admin.contact_messages') }}" class="{{ request()->routeIs('admin.contact_messages') ? 'active' : '' }}">
+            <i class="bi bi-envelope"></i> Contact Messages
+        </a>        
     </div>
 
     <!-- 🌾 Main Content -->

@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','Edit Category')
 @section('body')
-
+<div class="container-fluid py-4">
 <div class="row">
     <div class="col-lg-6 mx-auto">
         <div class="jumbotron shadow-sm">
@@ -29,5 +29,5 @@
         </div>
     </div>
 </div>
-
+</div>
 @endsection

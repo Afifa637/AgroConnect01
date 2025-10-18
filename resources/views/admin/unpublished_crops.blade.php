@@ -1,7 +1,7 @@
 @extends('admin.headerFooter')
 @section('title','Unpublished Crops')
 @section('body')
-
+<div class="container-fluid py-4">
 <section>
     <h5 class="text-center text-success mb-3">{{ Session::get('msg') }}</h5>
 
@@ -41,5 +41,5 @@
     {{-- Optional pagination or debug --}}
     {{ $crops->links ?? '' }}
 </section>
-
+</div>
 @endsection
