@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,14 +15,17 @@
             --agro-green: #198754;
             --agro-bg: #f7faf9;
         }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--agro-bg);
         }
+
         .navbar {
             background-color: var(--agro-green);
             color: white;
         }
+
         .sidebar {
             height: 100vh;
             width: 250px;
@@ -32,6 +36,7 @@
             padding: 20px;
             overflow-y: auto;
         }
+
         .sidebar a {
             display: block;
             padding: 10px 15px;
@@ -41,25 +46,33 @@
             transition: background 0.2s;
             font-weight: 500;
         }
-        .sidebar a.active, .sidebar a:hover {
+
+        .sidebar a.active,
+        .sidebar a:hover {
             background-color: var(--agro-green);
             color: #fff;
         }
+
         .content {
             margin-left: 250px;
             padding: 30px;
         }
+
         footer {
             background: #1b1f1a;
             color: #ddd;
             padding: 20px 0;
             text-align: center;
         }
+
         footer a {
             color: #a5cba1;
             text-decoration: none;
         }
-        footer a:hover { text-decoration: underline; }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -67,20 +80,28 @@
     <!-- 🧭 Top Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
         <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold text-white" href="{{ route('home') }}">
-                <i class="fa-solid fa-tractor me-2"></i>AgroConnect
+            <a class="navbar-brand fw-bold text-success" href="{{ route('home') }}">
+                <img src="{{ asset('final_eagri/img/logo.png') }}" alt="AgroConnect"
+                    style="height:35px; width:auto; transform:scale(3); transform-origin:left;">
             </a>
 
             <form class="d-flex ms-auto me-3" action="{{ route('farmer.search') }}" method="GET">
-                <input class="form-control form-control-sm me-2" type="search" name="query" placeholder="Search crops or buyers...">
+                <input class="form-control form-control-sm me-2" type="search" name="query"
+                    placeholder="Search crops or buyers...">
                 <button class="btn btn-light btn-sm"><i class="fa fa-search"></i></button>
             </form>
 
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item me-3">
-                    <a class="nav-link text-white position-relative" href="#">
+                    <a class="nav-link text-white position-relative" href="{{ route('farmer_orders') }}">
                         <i class="fa fa-bell"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">5</span>
+
+                        @if (!empty($orderCount) && $orderCount > 0)
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ $orderCount }}
+                            </span>
+                        @endif
                     </a>
                 </li>
 
@@ -89,15 +110,20 @@
                         <i class="fa fa-user-circle me-1"></i>{{ Session::get('f_username') }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{{ route('fa_profile', ['f_username' => Session::get('f_username')]) }}">Profile</a></li>
+                        <li><a class="dropdown-item"
+                                href="{{ route('fa_profile', ['f_username' => Session::get('f_username')]) }}">Profile</a>
+                        </li>
                         <li><a class="dropdown-item" href="{{ route('crop_manage') }}">Manage Crops</a></li>
                         <li><a class="dropdown-item" href="{{ route('farmer_orders') }}">Orders</a></li>
                         <li><a class="dropdown-item" href="{{ route('farm_bid_messages') }}">Bids & Messages</a></li>
                         <li><a class="dropdown-item" href="{{ route('f_settings') }}">Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <form action="{{ route('farmer.logout') }}" method="POST">@csrf
-                                <button class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-1"></i>Logout</button>
+                                <button class="dropdown-item text-danger"><i
+                                        class="fas fa-sign-out-alt me-1"></i>Logout</button>
                             </form>
                         </li>
                     </ul>
@@ -109,7 +135,8 @@
     <!-- 🌿 Sidebar -->
     <div class="sidebar">
         <div class="text-center mb-4">
-            <img src="{{ asset('final_eagri/img/farmer.png') }}" class="rounded-circle mb-2" width="80" alt="Farmer">
+            <img src="{{ asset($user->profile_pic ?? 'default.png') }}" class="img-thumbnail rounded-circle"
+                width="150">
             <h6>{{ Session::get('f_username') }}</h6>
             <p class="small text-muted">Farmer</p>
         </div>
@@ -126,7 +153,8 @@
             <i class="fa fa-upload me-2"></i> Add / Import Crops
         </a>
 
-        <a href="{{ route('farm_bid_messages') }}" class="{{ request()->routeIs('farm_bid_messages') ? 'active' : '' }}">
+        <a href="{{ route('farm_bid_messages') }}"
+            class="{{ request()->routeIs('farm_bid_messages') ? 'active' : '' }}">
             <i class="fa fa-comments me-2"></i> Bid Messages
         </a>
 
@@ -134,7 +162,8 @@
             <i class="fa fa-box me-2"></i> Orders
         </a>
 
-        <a href="{{ route('fa_profile', ['f_username' => Session::get('f_username')]) }}" class="{{ request()->routeIs('fa_profile') ? 'active' : '' }}">
+        <a href="{{ route('fa_profile', ['f_username' => Session::get('f_username')]) }}"
+            class="{{ request()->routeIs('fa_profile') ? 'active' : '' }}">
             <i class="fa fa-user me-2"></i> Profile
         </a>
 
@@ -163,4 +192,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

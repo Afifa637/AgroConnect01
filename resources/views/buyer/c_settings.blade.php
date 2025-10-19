@@ -1,118 +1,170 @@
 @extends('buyer.headerFooter')
 @section('body')
 
-<style>
-    .settings-container {
-        background: #f7fdf8;
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        margin-top: 3rem;
-    }
-    .nav-pills .nav-link.active {
-        background: #4caf50;
-    }
-    .table th {
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
-    .btn-success {
-        background-color: #43a047 !important;
-        border: none;
-    }
-</style>
-
-<div class="container settings-container">
-    <ul class="nav nav-pills justify-content-center mb-4">
-        <li class="nav-item"><a data-bs-toggle="pill" class="nav-link active" href="#profile">Profile Details</a></li>
-        <li class="nav-item"><a data-bs-toggle="pill" class="nav-link" href="#updateprofile">Update Profile</a></li>
-        <li class="nav-item"><a data-bs-toggle="pill" class="nav-link" href="#verification">Verification</a></li>
-    </ul>
-
-    <div class="tab-content">
-        {{-- Profile Tab --}}
-        <div id="profile" class="tab-pane fade show active">
-            <h3 class="text-center text-success mb-4">Profile Details</h3>
-            <table class="table table-bordered text-center">
-                <tr><th>Name</th><td>{{$user->username}}</td></tr>
-                <tr><th>Email</th><td>{{$user->email}}</td></tr>
-                <tr><th>Mobile</th><td>{{$user->mobile}}</td></tr>
-                <tr><th>Date of Birth</th><td>{{$user->dob}}</td></tr>
-                <tr><th>Division</th><td>{{$user->division}}</td></tr>
-                <tr><th>Address</th><td>{{$user->address}}</td></tr>
-                <tr><th>Zip Code</th><td>{{$user->zip_code}}</td></tr>
-                <tr><th>Gender</th><td>{{$user->gender}}</td></tr>
-                <tr><th>Profile Picture</th><td><img src="{{url($user->profile_pic)}}" height="180" class="rounded"></td></tr>
-                <tr><th>Joined</th><td>{{$user->created_at}}</td></tr>
-            </table>
+<div class="container my-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0"><i class="fas fa-user-cog me-2"></i> Buyer Settings</h4>
         </div>
 
-        {{-- Update Profile Tab --}}
-        <div id="updateprofile" class="tab-pane fade">
-            <div class="col-lg-8 mx-auto">
-                <form action="{{route('customerRegisterUpdate')}}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <h3 class="text-center text-success mb-3">Edit Your Information</h3>
-                    <input type="hidden" name="id" value="{{$user->id}}">
-                    <div class="mb-3"><label>Username</label>
-                        <input type="text" name="username" class="form-control" value="{{ $user->username }}" required>
-                    </div>
-                    <div class="mb-3"><label>Mobile</label>
-                        <input type="tel" name="mobile" class="form-control" value="{{$user->mobile}}">
-                    </div>
-                    <div class="mb-3"><label>Date of Birth</label>
-                        <input type="date" name="dob" class="form-control" value="{{$user->dob}}">
-                    </div>
-                    <div class="mb-3"><label>Division</label>
-                        <select class="form-control" name="division">
-                            <option>{{$user->division}}</option>
-                            <option>Dhaka</option><option>Rajshahi</option>
-                            <option>Khulna</option><option>Chittagong</option>
-                            <option>Barishal</option><option>Comilla</option><option>Rangpur</option>
-                        </select>
-                    </div>
-                    <div class="mb-3"><label>Address</label>
-                        <input type="text" name="address" class="form-control" value="{{$user->address}}">
-                    </div>
-                    <div class="mb-3"><label>Zip Code</label>
-                        <input type="number" name="zip_code" class="form-control" value="{{$user->zip_code}}">
-                    </div>
-                    <div class="mb-3"><label>Gender</label>
-                        <div>
-                            <label><input type="radio" name="gender" value="male" {{ $user->gender == 'male' ? 'checked' : '' }}> Male</label>
-                            <label class="ms-3"><input type="radio" name="gender" value="female" {{ $user->gender == 'female' ? 'checked' : '' }}> Female</label>
+        <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            <ul class="nav nav-pills mb-3" id="settingsTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#profile">
+                        <i class="fas fa-id-card me-1"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#updateprofile">
+                        <i class="fas fa-user-edit me-1"></i> Update Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#verification">
+                        <i class="fas fa-check-circle me-1"></i> Verification
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                {{-- PROFILE INFO --}}
+                <div id="profile" class="tab-pane fade show active">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body">
+                            <h5 class="fw-bold text-success mb-3">Profile Details</h5>
+                            <table class="table table-striped table-bordered">
+                                <tr><th>Name</th><td>{{ $user->username }}</td></tr>
+                                <tr><th>Email</th><td>{{ $user->email }}</td></tr>
+                                <tr><th>Mobile</th><td>{{ $user->mobile }}</td></tr>
+                                <tr><th>Date of Birth</th><td>{{ $user->dob }}</td></tr>
+                                <tr><th>Division</th><td>{{ $user->division }}</td></tr>
+                                <tr><th>Address</th><td>{{ $user->address }}</td></tr>
+                                <tr><th>Zip Code</th><td>{{ $user->zip_code }}</td></tr>
+                                <tr><th>Gender</th><td>{{ $user->gender }}</td></tr>
+                                <tr>
+                                    <th>Profile Picture</th>
+                                    <td><img src="{{ asset($user->profile_pic ?? 'default.png') }}" width="120" class="img-thumbnail"></td>
+                                </tr>
+                                <tr><th>Joined</th><td>{{ $user->created_at }}</td></tr>
+                                <tr>
+                                    <th>Verification Status</th>
+                                    <td>
+                                        @if($user->condition === 'verified')
+                                            <span class="badge bg-success">Verified</span>
+                                        @else
+                                            <span class="badge bg-danger">Unverified</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
-                    <div class="mb-3"><label>Password (leave blank to keep current)</label>
-                        <input type="password" name="password" class="form-control">
-                    </div>
-                    <div class="mb-3"><label>Confirm Password</label>
-                        <input type="password" name="password_confirmation" class="form-control">
-                    </div>
-                    <div class="mb-3"><label>Profile Image</label>
-                        <input type="file" name="profile_image" class="form-control">
-                    </div>
-                    <button class="btn btn-success w-100 mt-3">Update Profile</button>
-                </form>
-            </div>
-        </div>
+                </div>
 
-        {{-- Verification Tab --}}
-        <div id="verification" class="tab-pane fade">
-            <div class="col-lg-6 mx-auto mt-3">
-                <h3 class="text-center text-success mb-3">NID Verification</h3>
-                <form action="{{route('NID_verification')}}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="mb-3">
-                        <label>NID Front</label>
-                        <input type="file" name="nid_image" class="form-control">
+                {{-- UPDATE PROFILE --}}
+                <div id="updateprofile" class="tab-pane fade">
+                    <div class="card shadow-sm border-0 p-4">
+                        <h5 class="fw-bold text-success mb-3">
+                            <i class="fas fa-user-edit me-1"></i> Update Profile
+                        </h5>
+
+                        <form action="{{ route('customerRegisterUpdate') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $user->id }}">
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="username" value="{{ $user->username }}" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Mobile</label>
+                                    <input type="text" name="mobile" value="{{ $user->mobile }}" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" name="dob" value="{{ $user->dob }}" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Division</label>
+                                    <select name="division" class="form-control">
+                                        <option value="{{ $user->division }}">{{ $user->division }}</option>
+                                        <option>Dhaka</option>
+                                        <option>Rajshahi</option>
+                                        <option>Khulna</option>
+                                        <option>Chittagong</option>
+                                        <option>Barishal</option>
+                                        <option>Comilla</option>
+                                        <option>Rangpur</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" name="address" value="{{ $user->address }}" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Zip Code</label>
+                                    <input type="number" name="zip_code" value="{{ $user->zip_code }}" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Gender</label><br>
+                                    <label><input type="radio" name="gender" value="male" {{ $user->gender == 'male' ? 'checked' : '' }}> Male</label>
+                                    <label class="ms-3"><input type="radio" name="gender" value="female" {{ $user->gender == 'female' ? 'checked' : '' }}> Female</label>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Password (leave blank to keep current)</label>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" name="password_confirmation" class="form-control">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Profile Image</label>
+                                    <input type="file" name="profile_image" class="form-control">
+                                    <img src="{{ asset($user->profile_pic ?? 'default.png') }}" class="mt-2 img-thumbnail" width="120">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-success mt-3"><i class="fas fa-save me-1"></i> Save Changes</button>
+                        </form>
                     </div>
-                    <div class="mb-3">
-                        <label>NID Back</label>
-                        <input type="file" name="nid_image2" class="form-control">
-                    </div>
-                    <button class="btn btn-success w-100">Verify</button>
-                </form>
+                </div>
+
+                {{-- 🟢 NID VERIFICATION TAB --}}
+                <div id="verification" class="tab-pane fade">
+                    <form action="{{ route('NID_verification') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label>NID Front</label>
+                            <input type="file" name="nid_image" class="form-control" required>
+                            @if($user->NID_1)
+                                <img src="{{ asset($user->NID_1) }}" class="img-thumbnail mt-2" width="250">
+                            @endif
+                        </div>
+                        <div class="mb-3">
+                            <label>NID Back</label>
+                            <input type="file" name="nid_image2" class="form-control" required>
+                            @if($user->NID_2)
+                                <img src="{{ asset($user->NID_2) }}" class="img-thumbnail mt-2" width="250">
+                            @endif
+                        </div>
+                        <button class="btn btn-success"><i class="fas fa-check me-1"></i> Verify</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

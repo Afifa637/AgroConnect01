@@ -50,6 +50,16 @@
                                     <td><img src="{{ asset($user->profile_pic ?? 'default.png') }}" width="120" class="img-thumbnail"></td>
                                 </tr>
                                 <tr><th>Created At</th><td>{{ $user->created_at }}</td></tr>
+                                <tr>
+                                    <th>Verification Status</th>
+                                    <td>
+                                        @if($user->condition === 'verified')
+                                            <span class="badge bg-success">Verified</span>
+                                        @else
+                                            <span class="badge bg-danger">Unverified</span>
+                                        @endif
+                                    </td>
+                                </tr>                                
                             </table>
                         </div>
                     </div>

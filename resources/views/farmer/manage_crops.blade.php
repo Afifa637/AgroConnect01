@@ -1,84 +1,97 @@
 @extends('farmer.headerFooter')
 @section('body')
 
-    <div class="container my-5">
-        <h3 class="text-center mb-4 text-success"><i class="fas fa-warehouse"></i> Manage Crops</h3>
+<div class="container my-5">
+    <h3 class="text-center mb-4 text-success"><i class="fas fa-warehouse"></i> Manage Crops</h3>
 
-        @if (Session::get('msg'))
-            <div class="alert alert-success">{{ Session::get('msg') }}</div>
-        @endif
+    @if (Session::get('msg'))
+        <div class="alert alert-success">{{ Session::get('msg') }}</div>
+    @endif
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                @if ($crops->count() > 0)
-                    <table class="table table-striped table-hover align-middle text-center">
-                        <thead class="table-success">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if ($crops->count() > 0)
+                <table class="table table-striped table-hover align-middle text-center">
+                    <thead class="table-success">
+                        <tr>
+                            <th>#</th>
+                            <th>Crop</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Description</th>
+                            <th>End Date</th>
+                            <th>Image1</th>
+                            <th>Image2</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php($i = ($crops->currentPage() - 1) * $crops->perPage() + 1)
+                        @foreach ($crops as $crop)
                             <tr>
-                                <th>#</th>
-                                <th>Crop</th>
-                                <th>Type</th>
-                                <th>Quantity</th>
-                                <th>Rate</th>
-                                <th>Description</th>
-                                <th>End Date</th>
-                                <th>Image1</th>
-                                <th>Image2</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <td>{{ $i++ }}</td>
+                                <td>{{ $crop->crop_name }}</td>
+                                <td>{{ $crop->crop_type }}</td>
+                                <td>{{ $crop->crop_quantity }}</td>
+                                <td>{{ $crop->bid_rate }} Tk</td>
+                                <td>{{ Str::limit($crop->crop_description, 50) }}</td>
+                                <td>{{ $crop->last_date_bidding }}</td>
+                                <td>
+                                    @if($crop->crop_image)
+                                        <img src="{{ asset($crop->crop_image) }}" class="img-thumbnail" 
+                                             style="width:60px; height:60px; object-fit:cover;">
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($crop->crop_image2)
+                                        <img src="{{ asset($crop->crop_image2) }}" class="img-thumbnail" 
+                                             style="width:60px; height:60px; object-fit:cover;">
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($crop->status == 1)
+                                        <span class="badge bg-success">Active</span>
+                                    @else
+                                        <span class="badge bg-danger">Inactive</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <a href="{{ route('crop_status', ['id' => $crop->id]) }}" 
+                                       class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" 
+                                       title="Toggle Status">
+                                        <i class="fas fa-toggle-on"></i>
+                                    </a>
+                                    <a href="{{ route('crop_edit', ['id' => $crop->id]) }}" 
+                                       class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ route('crop_delete', ['id' => $crop->id]) }}" 
+                                       onclick="return confirm('Are you sure?');" 
+                                       class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @php($i = ($crops->currentPage() - 1) * $crops->perPage() + 1)
-                            @foreach ($crops as $crop)
-                                <tr>
-                                    <td>{{ $i++ }}</td>
-                                    <td>{{ $crop->crop_name }}</td>
-                                    <td>{{ $crop->crop_type }}</td>
-                                    <td>{{ $crop->crop_quantity }}</td>
-                                    <td>{{ $crop->bid_rate }} Tk</td>
-                                    <td>{{ Str::limit($crop->crop_description, 50) }}</td>
-                                    <td>{{ $crop->last_date_bidding }}</td>
-                                    <td><img src="{{ asset($crop->crop_image) }}" class="img-thumbnail" width="80"></td>
-                                    <td><img src="{{ asset($crop->crop_image2) }}" class="img-thumbnail" width="80"></td>
-                                    <td>
-                                        @if ($crop->status == 1)
-                                            <span class="badge bg-success">Active</span>
-                                        @else
-                                            <span class="badge bg-danger">Inactive</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('crop_status', ['id' => $crop->id]) }}"
-                                            class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
-                                            title="Toggle Status">
-                                            <i class="fas fa-toggle-on"></i>
-                                        </a>
-                                        <a href="{{ route('crop_edit', ['id' => $crop->id]) }}"
-                                            class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ route('crop_delete', ['id' => $crop->id]) }}"
-                                            onclick="return confirm('Are you sure?');" class="btn btn-sm btn-outline-danger"
-                                            data-bs-toggle="tooltip" title="Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    <div class="float-end mt-3">
-                        @if (method_exists($crops, 'links'))
-                            <div class="float-end mt-3">{{ $crops->links() }}</div>
-                        @endif
-                    </div>
-                @else
-                    <div class="alert alert-info text-center">
-                        No match found{{ $query != '' ? ' for "' . $query . '"' : '' }}
-                    </div>
-                @endif
-            </div>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-end mt-3">
+                    @if (method_exists($crops, 'links'))
+                        {{ $crops->links('pagination::bootstrap-5') }}
+                    @endif
+                </div>
+
+            @else
+                <div class="alert alert-info text-center">
+                    No match found{{ $query != '' ? ' for "' . $query . '"' : '' }}
+                </div>
+            @endif
         </div>
     </div>
+</div>
 
 @endsection

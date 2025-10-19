@@ -5,14 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\CropImport;
 use App\Models\PayConfirmMessage;
+use App\Models\Farmer_register;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class OrderController extends Controller
 {
-    /**
-     * Show payment form
-     */
+    public function __construct()
+{
+    view()->composer('farmer.*', function ($view) {
+        $username = Session::get('f_username');
+        $user = Farmer_register::where('username', $username)->first();
+
+        // Get the count of active or processing orders for this farmer
+        $orderCount = 0;
+        if ($username) {
+            $orderCount = \App\Models\Order::where('f_username', $username)
+                            ->whereIn('status', ['Processing', 'Pending'])
+                            ->count();
+        }
+
+        $view->with([
+            'user' => $user,
+            'orderCount' => $orderCount,
+        ]);
+    });
+}
     public function paymentForm($id)
     {
         $confirms = PayConfirmMessage::findOrFail($id);
@@ -90,7 +108,7 @@ class OrderController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return view('farmer.orders_info', compact('orders'));
+        return view('farmer.orders_info', compact('orders', ));
     }
 
     /**

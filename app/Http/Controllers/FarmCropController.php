@@ -10,9 +10,14 @@ use Illuminate\Support\Facades\Session;
 
 class FarmCropController extends Controller
 {
-    /**
-     * Show crop import form
-     */
+    public function __construct()
+    {
+        view()->composer('farmer.*', function ($view) {
+            $username = Session::get('f_username');
+            $user = Farmer_register::where('username', $username)->first();
+            $view->with('user', $user);
+        });
+    }
     public function create()
     {
         $categories = categories_info::where('categories_status', 1)->get();
@@ -59,7 +64,7 @@ class FarmCropController extends Controller
         $crop->Action = "Published";
         $crop->save();
 
-        return redirect()->route('crop_manage')->with('msg', 'Product saved successfully');
+        return redirect()->route('crop_manage', 'user')->with('msg', 'Product saved successfully');
     }
 
     /**

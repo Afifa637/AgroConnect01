@@ -9,16 +9,22 @@ use App\Models\CropImport;
 use App\Models\Farmer_register;
 use App\Models\User_register;
 use App\Models\PayConfirmMessage;
-
+use Illuminate\Support\Facades\Log; 
 class FarmerController extends Controller
 {
-    /**
-     * Farmer Home Page
-     */
+    public function __construct()
+    {
+        view()->composer('farmer.*', function ($view) {
+            $username = Session::get('f_username');
+            $user = Farmer_register::where('username', $username)->first();
+            $view->with('user', $user);
+        });
+    }
+
     public function f_home()
     {
         $crops = CropImport::where('username', Session::get('f_username'))->paginate(10);
-        return view('farmer.index', compact('crops'));
+        return view('farmer.index', compact('crops',));
     }
 
     public function searchCrops(Request $request)
@@ -62,46 +68,46 @@ class FarmerController extends Controller
     public function confirm_form($id)
     {
         $bid = Bid_message::findOrFail($id);
-        return view('farmer.confirm_form', compact('bid'))
+        return view('farmer.confirm_form', compact('bid', 'user'))
             ->with('msg', 'Payment Confirm successfully');
     }
     public function confirmPayment(Request $request, $id)
-{
-    $bid = Bid_message::findOrFail($id);
-    $request->validate([
-        'account_id'    => ['required', 'regex:/^((01|8801)[3456789]\d{8})$/'],
-        'account_type'  => 'required|string|max:50',
-        'confirm_price' => 'required|numeric|min:1',
-        'message'       => 'nullable|string|max:255',
-    ]);
-    // Save payment confirmation
-    $confirm = new PayConfirmMessage();
-    $confirm->f_username = Session::get('f_username');
-    $confirm->cust_username = $bid->cust_username;
-    $confirm->crop_id = $bid->crop_id;
-    $confirm->bid_message_id = $bid->id;
-    $confirm->crop_name       = $bid->crop_name;
-    $confirm->account_type    = $request->input('account_type');
-    $confirm->account_id      = $request->input('account_id');
-    $confirm->confirm_price   = $request->input('confirm_price'); 
-    $confirm->message = $request->input('message');
-    $confirm->save();
+    {
+        $bid = Bid_message::findOrFail($id);
+        $request->validate([
+            'account_id'    => ['required', 'regex:/^((01|8801)[3456789]\d{8})$/'],
+            'account_type'  => 'required|string|max:50',
+            'confirm_price' => 'required|numeric|min:1',
+            'message'       => 'nullable|string|max:255',
+        ]);
+        // Save payment confirmation
+        $confirm = new PayConfirmMessage();
+        $confirm->f_username = Session::get('f_username');
+        $confirm->cust_username = $bid->cust_username;
+        $confirm->crop_id = $bid->crop_id;
+        $confirm->bid_message_id = $bid->id;
+        $confirm->crop_name       = $bid->crop_name;
+        $confirm->account_type    = $request->input('account_type');
+        $confirm->account_id      = $request->input('account_id');
+        $confirm->confirm_price   = $request->input('confirm_price');
+        $confirm->message = $request->input('message');
+        $confirm->save();
 
-    // Close the crop’s bidding
-    $crop = CropImport::find($bid->crop_id);
-    if ($crop) {
-        $crop->Action = 'Unpublished'; // mark bidding as closed
-        $crop->save();
+        // Close the crop’s bidding
+        $crop = CropImport::find($bid->crop_id);
+        if ($crop) {
+            $crop->Action = 'Unpublished'; // mark bidding as closed
+            $crop->save();
+        }
+
+        // Deactivate other bids for that crop
+        Bid_message::where('crop_id', $bid->crop_id)
+            ->where('id', '!=', $bid->id)
+            ->update(['status' => 'inactive']);
+
+        return redirect()->route('confirm_crops')
+            ->with('msg', 'Payment confirmed and bidding closed for this crop.');
     }
-
-    // Deactivate other bids for that crop
-    Bid_message::where('crop_id', $bid->crop_id)
-        ->where('id', '!=', $bid->id)
-        ->update(['status' => 'inactive']);
-
-    return redirect()->route('confirm_crops')
-        ->with('msg', 'Payment confirmed and bidding closed for this crop.');
-}
 
     /**
      * List all confirmed crops
@@ -109,7 +115,7 @@ class FarmerController extends Controller
     public function confirm_crops()
     {
         $pay_confirms = PayConfirmMessage::where('f_username', Session::get('f_username'))->get();
-        return view('farmer.confirm_crops', compact('pay_confirms'));
+        return view('farmer.confirm_crops', compact('pay_confirms', 'user'));
     }
 
     /**
@@ -153,6 +159,16 @@ class FarmerController extends Controller
             'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
+        // Assign fields
+        $farmer->fill([
+            'username' => $validated['username'],
+            'mobile'   => $validated['mobile'],
+            'dob'      => $validated['dob'],
+            'division' => $validated['division'],
+            'zip_code' => $request->zip_code,
+            'address'  => $request->address,
+        ]);
+
         // Update model fields
         $farmer->username = $validated['username'];
         $farmer->mobile   = $validated['mobile'];
@@ -163,10 +179,8 @@ class FarmerController extends Controller
 
         // Handle image upload
         if ($request->hasFile('profile_image')) {
-            $image = $request->file('profile_image');
-            $imageName = $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/farmer_profiles'), $imageName);
-            $farmer->profile_pic = 'uploads/farmer_profiles/' . $imageName;
+            $path = $request->file('profile_image')->store('profiles', 'public');
+            $farmer->profile_pic = 'storage/' . $path;
         }
 
         $farmer->save();
@@ -197,41 +211,62 @@ class FarmerController extends Controller
     /**
      * NID verification upload
      */
-    public function NID_verification(Request $request)
-    {
-        $request->validate([
-            'nid_image'  => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'nid_image2' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+    
+public function NID_verification(Request $request)
+{
+    $request->validate([
+        'nid_image'  => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        'nid_image2' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        $path = 'uploads/nid_images/';
-        if (!file_exists(public_path($path))) {
-            mkdir(public_path($path), 0777, true);
+    $username = Session::get('f_username');
+    if (!$username) {
+        return back()->withErrors(['msg' => 'Session expired or not logged in. Please login and try again.']);
+    }
+    $farmer = Farmer_register::where('username', $username)->first();
+    if (!$farmer) {
+        return back()->withErrors(['msg' => "Farmer record not found for username: {$username}"]);
+    }
+
+    $path = 'uploads/nid_images/';
+    if (!file_exists(public_path($path))) {
+        if (!mkdir(public_path($path), 0777, true) && !is_dir(public_path($path))) {
+            Log::error("Failed to create NID upload directory: " . public_path($path));
+            return back()->withErrors(['msg' => 'Server error creating NID directory.']);
         }
+    }
 
+    try {
         $front = $request->file('nid_image');
         $back  = $request->file('nid_image2');
         $time  = time();
 
         $file1 = $time . '_front.' . $front->getClientOriginalExtension();
-        $file2 = $time . '_back.' . $back->getClientOriginalExtension();
+        $file2 = $time . '_back.'  . $back->getClientOriginalExtension();
 
         $front->move(public_path($path), $file1);
         $back->move(public_path($path), $file2);
 
-        $farmer = Farmer_register::where('username', Session::get('f_username'))->first();
+        // Explicit assign and save — more reliable for debugging than update()
+        $farmer->NID_1 = $path . $file1;
+        $farmer->NID_2 = $path . $file2;
+        $farmer->condition = 'verified';
+        $saved = $farmer->save();
 
-        if ($farmer) {
-            $farmer->update([
-                'NID_1' => $path . $file1,
-                'NID_2' => $path . $file2,
-            ]);
-
-            return redirect()->route('f_settings')->with('success', 'NID uploaded successfully!');
+        if (!$saved) {
+            Log::error("Failed to save Farmer after NID upload", ['username' => $username, 'farmer_id' => $farmer->id]);
+            return back()->withErrors(['msg' => 'Unable to update verification status.']);
         }
 
-        return back()->withErrors(['msg' => 'Farmer session not found.']);
+        // refresh session profile pic etc. (optional)
+        Session::put('f_profile', $farmer->profile_pic);
+
+        return redirect()->route('f_settings')->with('success', 'NID uploaded & account verified successfully!');
+    } catch (\Throwable $e) {
+        Log::error('NID upload error: ' . $e->getMessage(), ['username' => $username]);
+        return back()->withErrors(['msg' => 'An error occurred while uploading NID. Please try again.']);
     }
+}
 
     public function customer_profile($username)
     {

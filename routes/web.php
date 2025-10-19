@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FarmerController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\SslCommerzPaymentController;
 use Illuminate\Http\Request;
 
 /*
@@ -232,14 +232,14 @@ Route::middleware(['farmer.check'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['customer.check'])->group(function () {
-Route::controller(BuyerController::class)->group(function () {
-    Route::get('/customer/profile/{c_username}', 'cust_profile')->name('cust_profile');
-    Route::get('/confirm/message', 'c_message')->name('c_message');
-    Route::get('/customer', 'c_settings')->name('c_settings');
-    Route::post('/customer/registerUpdate', 'customerRegisterUpdate')->name('customerRegisterUpdate');
-    Route::get('/farmer/profile/check/{f_username}', 'farm_profile')->name('farm_profile');
-    Route::post('/buyer/logout',  'logout')->name('buyer.logout');
-});
+    Route::controller(BuyerController::class)->group(function () {
+        Route::get('/customer/profile/{c_username}', 'cust_profile')->name('cust_profile');
+        Route::get('/confirm/message', 'c_message')->name('c_message');
+        Route::get('/customer', 'c_settings')->name('c_settings');
+        Route::post('/customer/registerUpdate', 'customerRegisterUpdate')->name('customerRegisterUpdate');
+        Route::get('/farmer/profile/check/{f_username}', 'farm_profile')->name('farm_profile');
+        Route::post('/buyer/logout',  'logout')->name('buyer.logout');
+    });
 });
 
 // Wishlist Routes
