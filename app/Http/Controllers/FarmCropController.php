@@ -41,12 +41,18 @@ class FarmCropController extends Controller
         $crop = new CropImport($validated);
 
         if ($request->hasFile('crop_image')) {
-            $crop->crop_image = $request->file('crop_image')->store('crop_images', 'public');
+            $file = $request->file('crop_image');
+            $filename = time() . '_' . $file->getClientOriginalName(); // unique name
+            $file->move(public_path('crop_images'), $filename);
+            $crop->crop_image = 'crop_images/' . $filename; // save relative path
         }
-
+        
         if ($request->hasFile('crop_image2')) {
-            $crop->crop_image2 = $request->file('crop_image2')->store('crop_images', 'public');
-        }
+            $file2 = $request->file('crop_image2');
+            $filename2 = time() . '_' . $file2->getClientOriginalName();
+            $file2->move(public_path('crop_images'), $filename2);
+            $crop->crop_image2 = 'crop_images/' . $filename2;
+        }        
 
         $crop->status = "1";
         $crop->condition = "New";
@@ -64,8 +70,8 @@ class FarmCropController extends Controller
         $crops = CropImport::where('username', Session::get('f_username'))
             ->where('Action', '!=', "deleted")
             ->paginate(9);
-
-        return view('farmer.manage_crops', compact('crops'));
+            $query = ''; 
+        return view('farmer.manage_crops', compact('crops', 'query'));
     }
 
     /**
@@ -99,12 +105,18 @@ class FarmCropController extends Controller
         $crop->fill($validated);
 
         if ($request->hasFile('crop_image')) {
-            $crop->crop_image = $request->file('crop_image')->store('crop_images', 'public');
+            $file = $request->file('crop_image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('crop_images'), $filename);
+            $crop->crop_image = 'crop_images/' . $filename;
         }
-
+        
         if ($request->hasFile('crop_image2')) {
-            $crop->crop_image2 = $request->file('crop_image2')->store('crop_images', 'public');
-        }
+            $file2 = $request->file('crop_image2');
+            $filename2 = time() . '_' . $file2->getClientOriginalName();
+            $file2->move(public_path('crop_images'), $filename2);
+            $crop->crop_image2 = 'crop_images/' . $filename2;
+        }        
 
         $crop->condition = "New";
         $crop->Action = "Published";

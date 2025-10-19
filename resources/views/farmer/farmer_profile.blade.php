@@ -67,33 +67,6 @@
         </div>
     </div>
 
-    {{-- ================= CROPS LIST ================= --}}
-    <h4 class="text-success mb-4"><i class="fas fa-leaf me-2"></i>My Crops</h4>
-    <div class="row" id="menu-section">
-        @forelse($crops as $crop)
-            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <img class="card-img-top" src="{{ asset('storage/'.$crop->crop_image) }}" alt="{{ $crop->crop_name }}" height="200">
-                        <div class="item-desc">
-                            <h5 class="item-name">{{ $crop->crop_name }}</h5>
-                            <p>Condition: {{ $crop->condition }}</p>
-                            <p>Quantity: {{ $crop->crop_quantity }}</p>
-                            <p>Bid Rate: {{ $crop->bid_rate }} TK</p>
-                            <p>Last Date: {{ $crop->last_date_bidding }}</p>
-                            <a class="btn btn-success btn-block" href="{{ route('crop_edit', $crop->id) }}">
-                                Edit Crop
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="text-center">
-                <p class="text-muted">No crops added yet. <a href="{{ route('crop_import') }}">Add your first crop</a></p>
-            </div>
-        @endforelse
-    </div>
 </div>
 
 @endsection

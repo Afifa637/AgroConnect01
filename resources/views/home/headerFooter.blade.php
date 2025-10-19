@@ -19,8 +19,10 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top py-2">
         <div class="container">
             <a class="navbar-brand fw-bold text-success" href="{{ route('home') }}">
-                <img src="{{ asset('final_eagri/img/agri.png') }}" alt="AgroConnect"> AgroConnect
-            </a>
+                <img src="{{ asset('final_eagri/img/logo.png') }}" 
+                     alt="AgroConnect" 
+                     style="height:35px; width:auto; transform:scale(2.5); transform-origin:center;">
+            </a>            
 
             <form class="position-relative d-none d-md-flex mx-auto w-50" id="main-search" role="search"
                 action="{{ route('search') }}" method="get" autocomplete="off">
@@ -121,19 +123,18 @@
                 <!-- About -->
                 <div class="col-md-4">
                     <a href="{{ route('home') }}" class="d-inline-flex align-items-center mb-3 text-decoration-none">
-                        <img src="{{ asset('final_eagri/img/agri.png') }}" alt="AgroConnect"
-                            style="height:44px;width:auto;margin-right:10px;">
-                        <span class="h5 mb-0 fw-bold text-success">AgroConnect</span>
+                        <img src="{{ asset('final_eagri/img/logo.png') }}" alt="AgroConnect"
+                            style="height:35px; width:auto; transform:scale(2.5)">
                     </a>
                     <p class="text-muted small mb-2">Empowering sustainable agriculture through direct connections
                         between farmers and buyers. Fair pricing • Secure bidding • Verified partners.</p>
 
                     <div class="d-flex gap-2 mt-3">
-                        <a class="btn btn-outline-light btn-sm" href="#" aria-label="Facebook"><i
+                        <a class="btn btn-outline-light btn-sm" href="https://www.facebook.com/share/1BRv1TE88Y/" aria-label="Facebook"><i
                                 class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-outline-light btn-sm" href="#" aria-label="YouTube"><i
+                        <a class="btn btn-outline-light btn-sm" href="https://www.youtube.com/@harshadachirmure967" aria-label="YouTube"><i
                                 class="fab fa-youtube"></i></a>
-                        <a class="btn btn-outline-light btn-sm" href="#" aria-label="Instagram"><i
+                        <a class="btn btn-outline-light btn-sm" href="https://www.instagram.com/AgroConnect" aria-label="Instagram"><i
                                 class="fab fa-instagram"></i></a>
                     </div>
 
@@ -222,7 +223,7 @@
                 class="popup-header bg-success text-white d-flex justify-content-between align-items-center p-2 rounded-top">
                 <div class="d-flex align-items-center gap-2">
                     <img src="https://via.placeholder.com/36?text=A" alt="AgroConnect"
-                        style="border-radius:50%;width:36px;height:36px">
+                        style="height:35px; width:auto; transform:scale(2.5)">
                     <div>
                         <div style="font-weight:600">AgroConnect</div>
                         <div class="small">Usually replies within a few hours</div>

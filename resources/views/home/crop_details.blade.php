@@ -245,7 +245,7 @@
                         <a href="{{ route('crop_details', ['id' => $rel->id]) }}"
                             class="list-group-item list-group-item-action border-0 mb-2 p-2 rounded shadow-sm">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="{{ asset($rel->crop_image) }}" width="70" height="55"
+                                <img src="{{ asset('storage/' . $crop->crop_image) }}" width="70" height="55"
                                     style="object-fit:cover;" alt="{{ $rel->crop_name }}">
                                 <div>
                                     <div class="small fw-semibold">{{ Str::limit($rel->crop_name, 36) }}</div>

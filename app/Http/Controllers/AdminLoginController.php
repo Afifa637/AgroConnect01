@@ -153,7 +153,7 @@ class AdminLoginController extends Controller
         $imageUrl = null;
         if ($request->hasFile('profile_image')) {
             $profileImage = $request->file('profile_image');
-            $imageName = time() . '_' . Str::slug(pathinfo($profileImage->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $profileImage->getClientOriginalExtension();
+            $imageName = Str::slug(pathinfo($profileImage->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $profileImage->getClientOriginalExtension();
             $profileImage->storeAs('public/profile_images', $imageName);
             $imageUrl = Storage::url('profile_images/' . $imageName);
         }

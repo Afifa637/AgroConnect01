@@ -164,7 +164,7 @@ class FarmerController extends Controller
         // Handle image upload
         if ($request->hasFile('profile_image')) {
             $image = $request->file('profile_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imageName = $image->getClientOriginalExtension();
             $image->move(public_path('uploads/farmer_profiles'), $imageName);
             $farmer->profile_pic = 'uploads/farmer_profiles/' . $imageName;
         }
@@ -233,9 +233,6 @@ class FarmerController extends Controller
         return back()->withErrors(['msg' => 'Farmer session not found.']);
     }
 
-    /**
-     * Customer details by username
-     */
     public function customer_profile($username)
     {
         $crops = Bid_message::where('cust_username', $username)

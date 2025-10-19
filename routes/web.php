@@ -47,7 +47,6 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/contact', 'contact')->name('contact');
     Route::get('/gallery', 'gallery')->name('gallery');
     Route::get('/news_info', 'news_info')->name('news_info');
-
     // Crops
     Route::get('/categories/{crop_type}', 'Categories')->name('categories');
     Route::get('/sessions/categories/{crop_type}/{crop_session}', 'Session_Categories')->name('Session_Categories');
@@ -131,9 +130,6 @@ Route::prefix('admin')->controller(AdminController::class)->group(function () {
     Route::get('/categories/delete/{id}', 'categories_delete')->name('categories_delete');
 
     // News
-    Route::get('/news',  'news_page')->name('news_page');
-Route::get('/news/ajax/{id}',  'ajax_news');
-
     Route::get('/add/news', 'add_news')->name('add_news');
     Route::post('/news/save', 'save_news_db')->name('save_news_db');
     Route::get('/manage/news', 'manage_news')->name('manage_news');

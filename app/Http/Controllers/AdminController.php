@@ -174,7 +174,7 @@ class AdminController extends Controller
 
         if ($request->hasFile('news_image')) {
             $file = $request->file('news_image');
-            $imageName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))
+            $imageName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))
                 . '.' . $file->getClientOriginalExtension();
 
             // store in storage/app/public/news_images
@@ -215,7 +215,7 @@ class AdminController extends Controller
         $imageUrl = null;
         if ($request->hasFile('news_image')) {
             $file = $request->file('news_image');
-            $imageName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $imageName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/news_images', $imageName);
             $imageUrl = Storage::url('news_images/' . $imageName);
         }

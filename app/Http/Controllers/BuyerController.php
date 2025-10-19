@@ -82,7 +82,7 @@ class BuyerController extends Controller
         // Handle profile picture
         if ($request->hasFile('profile_image')) {
             $image = $request->file('profile_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imageName = $image->getClientOriginalExtension();
             $image->move(public_path('uploads/customer_profiles'), $imageName);
             $customer->profile_pic = 'uploads/customer_profiles/' . $imageName;
         }

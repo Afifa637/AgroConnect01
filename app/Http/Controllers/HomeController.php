@@ -93,13 +93,13 @@ class HomeController extends Controller
 
     // 📰 News Page
     public function news_info()
-{
-    $categories = categories_info::where('categories_status', 1)->get();
-    $latestNews = news_info::orderBy('created_at', 'desc')->take(10)->get(); // add this
-    $newses = news_info::latest()->paginate(6);
-    
-    return view('home.news_info', compact('newses', 'categories', 'latestNews'));
-}
+    {
+        $categories = categories_info::where('categories_status', 1)->get();
+        $latestNews = news_info::orderBy('created_at', 'desc')->take(10)->get(); // add this
+        $newses = news_info::latest()->paginate(6);
+
+        return view('home.news_info', compact('newses', 'categories', 'latestNews'));
+    }
 
     // 🌾 Categories
     public function Categories($crop_type)
@@ -184,7 +184,7 @@ class HomeController extends Controller
             'name'    => 'required|string|max:191',
             'email'   => 'required|email|max:191',
             'phone'   => 'nullable|string|max:40',
-            'subject' => 'required|string|max:191', 
+            'subject' => 'required|string|max:191',
             'message' => 'required|string|max:5000',
         ]);
 
@@ -194,27 +194,5 @@ class HomeController extends Controller
         return redirect()->to(route('contact') . '#contact')
             ->with('contact_success', 'Thanks! Your message has been received. We will contact you soon.');
     }
-
-    public function news_page()
-    {
-        // Fetch latest 10 news for sidebar and main content
-        $latestNews = news_info::orderBy('created_at', 'desc')->take(10)->get();
-    
-        // Pass $latestNews to the view
-        return view('home.news_info', compact('latestNews'));
-    }
-    
-    // AJAX method for fetching single news (used by JS)
-    public function ajax_news($id)
-    {
-        $news = news_info::findOrFail($id);
-    
-        return response()->json([
-            'news_name' => $news->news_name,
-            'news_image' => asset($news->news_image),
-            'long_description' => $news->long_description,
-            'created_at' => $news->created_at->format('d M Y'),
-        ]);
-    }    
 
 }
