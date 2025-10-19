@@ -95,20 +95,22 @@
     <div class="container-fluid mt-5 pt-3">
         <div class="row">
             <aside class="col-lg-2 mb-4">
-                <div class="card border-success shadow-sm">
-                    <div class="card-header bg-success text-white fw-bold text-center">Categories</div>
-                    <ul class="list-group list-group-flush">
-                        @foreach (App\Models\categories_info::where('categories_status', 1)->get() as $categorie)
-                            <li class="list-group-item">
-                                <a href="{{ route('categories', ['crop_type' => $categorie->id]) }}"
-                                    class="text-success text-decoration-none fw-semibold">
-                                    {{ $categorie->categories_name }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                <div class="sticky-aside">
+                    <div class="card border-success shadow-sm">
+                        <div class="card-header bg-success text-white fw-bold text-center">Categories</div>
+                        <ul class="list-group list-group-flush">
+                            @foreach (App\Models\categories_info::where('categories_status', 1)->get() as $categorie)
+                                <li class="list-group-item">
+                                    <a href="{{ route('categories', ['crop_type' => $categorie->id]) }}"
+                                        class="text-success text-decoration-none fw-semibold">
+                                        {{ $categorie->categories_name }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
-            </aside>
+            </aside>            
 
             <main class="col-lg-10">
                 @yield('body')
@@ -263,7 +265,16 @@
             height: 44px;
             width: auto;
             margin-right: 8px;
-        }
+        }.navbar.bg-success {
+  position: fixed;
+  top: 12px; /* height of top navbar */
+  width: 100%;
+  z-index: 1020;
+}.sticky-aside {
+  position: sticky;
+  top: 126px; /* combined navbar height */
+  z-index: 1010;
+}   
         .card-ghost {
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.90));
         }

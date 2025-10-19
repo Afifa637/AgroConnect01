@@ -145,30 +145,44 @@ class AdminLoginController extends Controller
 
     public function adminregisterUpdate(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'id' => 'required|integer',
-            'mobile' => ['required', 'regex:/^((01|8801)[3456789])([0-9]{8})$/'],
+            'mobile' => 'required|string|max:15',
+            'dob' => 'required|date',
+            'division' => 'required|string|max:50',
+            'address' => 'required|string|max:255',
+            'gender' => 'required|string|in:male,female',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
-
-        $imageUrl = null;
+    
+        $user = admin_register::findOrFail($request->id);
+    
+        // handle new profile image upload
         if ($request->hasFile('profile_image')) {
-            $profileImage = $request->file('profile_image');
-            $imageName = Str::slug(pathinfo($profileImage->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $profileImage->getClientOriginalExtension();
-            $profileImage->storeAs('public/profile_images', $imageName);
-            $imageUrl = Storage::url('profile_images/' . $imageName);
+            // delete old image if it exists
+            if ($user->profile_pic && Storage::exists(str_replace('storage/', 'public/', $user->profile_pic))) {
+                Storage::delete(str_replace('storage/', 'public/', $user->profile_pic));
+            }
+    
+            $file = $request->file('profile_image');
+            $imageName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/admin_profiles', $imageName);
+    
+            $user->profile_pic = 'storage/admin_profiles/' . $imageName;
         }
-
-        $regis = admin_register::where('id', $request->id)->firstOrFail();
-        $regis->mobile = $request->mobile;
-        $regis->dob = $request->dob;
-        $regis->division = $request->division;
-        $regis->address = $request->address;
-        $regis->gender = $request->gender;
-        if ($imageUrl) {
-            $regis->profile_pic = $imageUrl;
-        }
-
-        $regis->save();
-        return redirect()->route('a_settings')->with('msg', 'Update Successfully');
+    
+        // update text fields
+        $user->mobile = $request->mobile;
+        $user->dob = $request->dob;
+        $user->division = $request->division;
+        $user->address = $request->address;
+        $user->gender = $request->gender;
+    
+        $user->save();
+    
+        // update session username if changed (though username is readonly)
+        Session::put('a_username', $user->username);
+    
+        return redirect()->route('a_settings')->with('msg', 'Profile updated successfully');
     }
 }

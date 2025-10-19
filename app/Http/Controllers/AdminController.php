@@ -240,12 +240,15 @@ class AdminController extends Controller
         return redirect()->route('manage_news')->with('msg', 'News deleted successfully');
     }
 
-    // Admin profile & settings
     public function a_profile()
-    {
-        $newses = news_info::where('username', Session::get('a_username'))->get();
-        return view('admin.a_profile', compact('newses'));
-    }
+{
+    $username = Session::get('a_username');
+
+    $user = \App\Models\admin_register::where('username', $username)->first();
+    $newses = \App\Models\news_info::where('username', $username)->get();
+
+    return view('admin.a_profile', compact('user', 'newses'));
+}
 
     public function a_settings()
     {

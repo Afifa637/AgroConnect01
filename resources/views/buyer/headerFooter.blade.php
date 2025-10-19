@@ -151,23 +151,7 @@
         <a href="{{ route('home') }}" class="mb-2 d-block btn btn-sm btn-success text-white">
             <i class="fa fa-home me-2"></i> Browse Crops
         </a>
-
         <hr>
-
-        @if (!empty($categories))
-            @foreach ($categories as $category)
-                @if (!empty($category->crop_type))
-                    <a href="{{ route('categories', ['crop_type' => $category->crop_type]) }}"
-                        class="{{ request()->is('categories/' . $category->crop_type) ? 'active' : '' }}">
-                        <i class="fa fa-seedling me-2"></i> {{ ucfirst($category->crop_type) }}
-                    </a>
-                @endif
-            @endforeach
-        @endif
-
-        <hr>
-
-        <h6 class="text-success">Quick Links</h6>
         @if (Session::has('c_username'))
             <a href="{{ route('wishlist', ['c_username' => Session::get('c_username')]) }}"
                 class="{{ request()->routeIs('wishlist') ? 'active' : '' }}">

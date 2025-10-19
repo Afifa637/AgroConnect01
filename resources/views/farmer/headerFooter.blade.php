@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Farmer Dashboard - AgroConnect')</title>
-
     <!-- Bootstrap + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
@@ -15,19 +14,23 @@
             --agro-green: #198754;
             --agro-bg: #f7faf9;
         }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--agro-bg);
-        }
-
+        html, body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Poppins', sans-serif;
+        background: var(--agro-bg);
+    }
+    body {
+        flex: 1 0 auto; /* allow content to grow */
+    }
         .navbar {
             background-color: var(--agro-green);
             color: white;
         }
-
         .sidebar {
-            height: 100vh;
+            height: calc(100vh - 56px);
             width: 250px;
             position: fixed;
             background: #fff;
@@ -36,7 +39,11 @@
             padding: 20px;
             overflow-y: auto;
         }
-
+        .sidebar h6 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--agro-green);
+    }
         .sidebar a {
             display: block;
             padding: 10px 15px;
@@ -46,30 +53,25 @@
             transition: background 0.2s;
             font-weight: 500;
         }
-
         .sidebar a.active,
         .sidebar a:hover {
             background-color: var(--agro-green);
             color: #fff;
         }
-
         .content {
             margin-left: 250px;
-            padding: 30px;
+            padding: 30px; flex: 1 0 auto;
         }
-
         footer {
-            background: #1b1f1a;
+            background: #494a48;
             color: #ddd;
             padding: 20px 0;
-            text-align: center;
+            text-align: center; flex-shrink: 0;
         }
-
         footer a {
             color: #a5cba1;
             text-decoration: none;
         }
-
         footer a:hover {
             text-decoration: underline;
         }
@@ -138,7 +140,6 @@
             <img src="{{ asset($user->profile_pic ?? 'default.png') }}" class="img-thumbnail rounded-circle"
                 width="150">
             <h6>{{ Session::get('f_username') }}</h6>
-            <p class="small text-muted">Farmer</p>
         </div>
 
         <a href="{{ route('f_home') }}" class="{{ request()->routeIs('f_home') ? 'active' : '' }}">
@@ -176,7 +177,6 @@
         <h6 class="text-success">Analytics</h6>
         <a href="#"><i class="fa fa-chart-line me-2"></i> Sales Stats</a>
         <a href="#"><i class="fa fa-wallet me-2"></i> Earnings</a>
-        <a href="#"><i class="fa fa-user-friends me-2"></i> Customer Insights</a>
     </div>
 
     <!-- 🌾 Main Content -->
