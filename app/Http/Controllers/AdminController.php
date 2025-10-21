@@ -23,10 +23,10 @@ class AdminController extends Controller
      * Protect admin routes with middleware (admin login).
      * Ensure you registered middleware alias 'admin.login' (or change to your alias) in Kernel.php
      */
-    // public function __construct()
-    // {
-    //     $this->middleware('admin.login');
-    // }
+    public function __construct()
+    {
+        $this->middleware('admin.check');
+    }
 
     // Admin home 
     public function a_home()

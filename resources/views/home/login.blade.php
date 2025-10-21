@@ -36,10 +36,10 @@
                         <div class="mb-3">
                             <label for="register_as" class="form-label">Login As</label>
                             <select name="register_as" id="register_as" class="form-select" required>
-                                <option value="" disabled selected>Select your role</option>
-                                <option value="farmer">Farmer</option>
-                                <option value="customer">Buyer</option>
-                                <option value="admin">Admin</option>
+                                <option value="" disabled {{ !Cookie::has('login_role') ? 'selected' : '' }}>Select your role</option>
+                                <option value="farmer" {{ Cookie::get('login_role') == 'farmer' ? 'selected' : '' }}>Farmer</option>
+                                <option value="customer" {{ Cookie::get('login_role') == 'customer' ? 'selected' : '' }}>Buyer</option>
+                                <option value="admin" {{ Cookie::get('login_role') == 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
                             @error('register_as')
                                 <span class="text-danger small">{{ $message }}</span>
@@ -50,7 +50,8 @@
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" class="form-control"
-                                placeholder="Enter your email" value="{{ old('email') }}" required>
+                                   placeholder="Enter your email"
+                                   value="{{ old('email', Cookie::get('login_email')) }}" required>
                             @error('email')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
@@ -60,7 +61,7 @@
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" name="password" id="password" class="form-control"
-                                placeholder="Enter your password" required>
+                                   placeholder="Enter your password" required>
                             @error('password')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
@@ -68,7 +69,8 @@
 
                         <!-- Remember Me -->
                         <div class="form-check mb-3">
-                            <input type="checkbox" name="remember" id="remember" class="form-check-input">
+                            <input type="checkbox" name="remember" id="remember" class="form-check-input"
+                                   {{ Cookie::has('login_email') ? 'checked' : '' }}>
                             <label for="remember" class="form-check-label">Remember Me</label>
                         </div>
 
@@ -116,7 +118,7 @@
                     <div class="mb-3">
                         <label for="email_fp" class="form-label">Email</label>
                         <input type="email" name="email" id="email_fp" class="form-control"
-                            placeholder="Enter your email" required>
+                               placeholder="Enter your email" required>
                         @error('email')
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror

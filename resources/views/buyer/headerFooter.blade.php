@@ -142,7 +142,7 @@
     <div class="sidebar text-center">
         @if (Session::has('c_username'))
             <div class="mb-4">
-                <img src="{{ asset($user->profile_pic ?? 'default.png') }}" class="rounded-circle border border-2"
+                <img src="{{ asset('storage/'.$user->profile_pic ?? 'default.png') }}" class="rounded-circle border-2"
                     width="100" height="100" alt="Profile">
                 <h6 class="mt-2 fw-bold text-success">{{ Session::get('c_username') }}</h6>
             </div>

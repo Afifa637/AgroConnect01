@@ -6,17 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Models\Bid_message;
 use App\Models\CropImport;
-use App\Models\Farmer_register;
+use App\Models\farmer_register;
 use App\Models\User_register;
 use App\Models\PayConfirmMessage;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
+
 class FarmerController extends Controller
 {
     public function __construct()
     {
         view()->composer('farmer.*', function ($view) {
             $username = Session::get('f_username');
-            $user = Farmer_register::where('username', $username)->first();
+            $user = farmer_register::where('username', $username)->first();
             $view->with('user', $user);
         });
     }
@@ -135,7 +136,7 @@ class FarmerController extends Controller
      */
     public function fa_profile($f_username)
     {
-        $user = Farmer_register::where('username', $f_username)->firstOrFail(); // single model
+        $user = farmer_register::where('username', $f_username)->firstOrFail(); // single model
         $crops = CropImport::where('username', $f_username)
             ->where('Action', '!=', 'deleted')
             ->get();
@@ -146,7 +147,7 @@ class FarmerController extends Controller
     // Update profile
     public function updateProfile(Request $request)
     {
-        $farmer = Farmer_register::where('username', Session::get('f_username'))->firstOrFail();
+        $farmer = farmer_register::where('username', Session::get('f_username'))->firstOrFail();
 
         // Validation
         $validated = $request->validate([
@@ -200,7 +201,7 @@ class FarmerController extends Controller
      */
     public function f_settings()
     {
-        $user = Farmer_register::where('username', Session::get('f_username'))->first();
+        $user = farmer_register::where('username', Session::get('f_username'))->first();
 
         if (!$user) {
             return redirect()->route('f_login')->withErrors(['msg' => 'Please log in first.']);
@@ -211,62 +212,62 @@ class FarmerController extends Controller
     /**
      * NID verification upload
      */
-    
-public function NID_verification(Request $request)
-{
-    $request->validate([
-        'nid_image'  => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        'nid_image2' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
 
-    $username = Session::get('f_username');
-    if (!$username) {
-        return back()->withErrors(['msg' => 'Session expired or not logged in. Please login and try again.']);
-    }
-    $farmer = Farmer_register::where('username', $username)->first();
-    if (!$farmer) {
-        return back()->withErrors(['msg' => "Farmer record not found for username: {$username}"]);
-    }
+    public function NID_verification(Request $request)
+    {
+        $request->validate([
+            'nid_image'  => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'nid_image2' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    $path = 'uploads/nid_images/';
-    if (!file_exists(public_path($path))) {
-        if (!mkdir(public_path($path), 0777, true) && !is_dir(public_path($path))) {
-            Log::error("Failed to create NID upload directory: " . public_path($path));
-            return back()->withErrors(['msg' => 'Server error creating NID directory.']);
+        $username = Session::get('f_username');
+        if (!$username) {
+            return back()->withErrors(['msg' => 'Session expired or not logged in. Please login and try again.']);
         }
-    }
-
-    try {
-        $front = $request->file('nid_image');
-        $back  = $request->file('nid_image2');
-        $time  = time();
-
-        $file1 = $time . '_front.' . $front->getClientOriginalExtension();
-        $file2 = $time . '_back.'  . $back->getClientOriginalExtension();
-
-        $front->move(public_path($path), $file1);
-        $back->move(public_path($path), $file2);
-
-        // Explicit assign and save — more reliable for debugging than update()
-        $farmer->NID_1 = $path . $file1;
-        $farmer->NID_2 = $path . $file2;
-        $farmer->condition = 'verified';
-        $saved = $farmer->save();
-
-        if (!$saved) {
-            Log::error("Failed to save Farmer after NID upload", ['username' => $username, 'farmer_id' => $farmer->id]);
-            return back()->withErrors(['msg' => 'Unable to update verification status.']);
+        $farmer = farmer_register::where('username', $username)->first();
+        if (!$farmer) {
+            return back()->withErrors(['msg' => "Farmer record not found for username: {$username}"]);
         }
 
-        // refresh session profile pic etc. (optional)
-        Session::put('f_profile', $farmer->profile_pic);
+        $path = 'uploads/nid_images/';
+        if (!file_exists(public_path($path))) {
+            if (!mkdir(public_path($path), 0777, true) && !is_dir(public_path($path))) {
+                Log::error("Failed to create NID upload directory: " . public_path($path));
+                return back()->withErrors(['msg' => 'Server error creating NID directory.']);
+            }
+        }
 
-        return redirect()->route('f_settings')->with('success', 'NID uploaded & account verified successfully!');
-    } catch (\Throwable $e) {
-        Log::error('NID upload error: ' . $e->getMessage(), ['username' => $username]);
-        return back()->withErrors(['msg' => 'An error occurred while uploading NID. Please try again.']);
+        try {
+            $front = $request->file('nid_image');
+            $back  = $request->file('nid_image2');
+            $time  = time();
+
+            $file1 = $time . '_front.' . $front->getClientOriginalExtension();
+            $file2 = $time . '_back.'  . $back->getClientOriginalExtension();
+
+            $front->move(public_path($path), $file1);
+            $back->move(public_path($path), $file2);
+
+            // Explicit assign and save — more reliable for debugging than update()
+            $farmer->NID_1 = $path . $file1;
+            $farmer->NID_2 = $path . $file2;
+            $farmer->condition = 'verified';
+            $saved = $farmer->save();
+
+            if (!$saved) {
+                Log::error("Failed to save Farmer after NID upload", ['username' => $username, 'farmer_id' => $farmer->id]);
+                return back()->withErrors(['msg' => 'Unable to update verification status.']);
+            }
+
+            // refresh session profile pic etc. (optional)
+            Session::put('f_profile', $farmer->profile_pic);
+
+            return redirect()->route('f_settings')->with('success', 'NID uploaded & account verified successfully!');
+        } catch (\Throwable $e) {
+            Log::error('NID upload error: ' . $e->getMessage(), ['username' => $username]);
+            return back()->withErrors(['msg' => 'An error occurred while uploading NID. Please try again.']);
+        }
     }
-}
 
     public function customer_profile($username)
     {

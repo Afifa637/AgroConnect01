@@ -8,9 +8,35 @@
         </div>
 
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
+            {{-- Flash Message --}}
+@if (session('login_success') || session('reg_success') || session('msg') || session('l_msg') || session('login_error')|| session('success'))
+<div class="container mt-3">
+    @if (session('login_success'))
+        <div class="alert alert-success text-center">{{ session('login_success') }}</div>
+    @endif
+    @if (session('reg_success'))
+        <div class="alert alert-success text-center">{{ session('reg_success') }}</div>
+    @endif
+    @if (session('msg'))
+        <div class="alert alert-info text-center">{{ session('msg') }}</div>
+    @endif
+    @if (session('l_msg'))
+        <div class="alert alert-warning text-center">{{ session('l_msg') }}</div>
+    @endif
+    @if (session('login_error'))
+        <div class="alert alert-danger text-center">{{ session('login_error') }}</div>
+    @endif
+    @if (session('success'))
+<div class="alert alert-success text-center">{{ session('success') }}</div>
+@endif
+</div>
+@endif
+
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+}, 4000);
+</script>
 
             <ul class="nav nav-pills mb-3" id="settingsTabs">
                 <li class="nav-item">
@@ -47,7 +73,7 @@
                                 <tr><th>Gender</th><td>{{ $user->gender }}</td></tr>
                                 <tr>
                                     <th>Profile Picture</th>
-                                    <td><img src="{{ asset($user->profile_pic ?? 'default.png') }}" width="120" class="img-thumbnail"></td>
+                                    <td><img src="{{ asset('storage/'.$user->profile_pic ?? 'default.png') }}" width="120" class="img-thumbnail"></td>
                                 </tr>
                                 <tr><th>Joined</th><td>{{ $user->created_at }}</td></tr>
                                 <tr>
@@ -135,7 +161,7 @@
                                 <div class="col-md-12">
                                     <label class="form-label">Profile Image</label>
                                     <input type="file" name="profile_image" class="form-control">
-                                    <img src="{{ asset($user->profile_pic ?? 'default.png') }}" class="mt-2 img-thumbnail" width="120">
+                                    <img src="{{ asset('storage/'.$user->profile_pic ?? 'default.png') }}" class="mt-2 img-thumbnail" width="120">
                                 </div>
                             </div>
 
@@ -152,14 +178,14 @@
                             <label>NID Front</label>
                             <input type="file" name="nid_image" class="form-control" required>
                             @if($user->NID_1)
-                                <img src="{{ asset($user->NID_1) }}" class="img-thumbnail mt-2" width="250">
+                                <img src="{{ asset('storage/'.$user->NID_1) }}" class="img-thumbnail mt-2" width="250">
                             @endif
                         </div>
                         <div class="mb-3">
                             <label>NID Back</label>
                             <input type="file" name="nid_image2" class="form-control" required>
                             @if($user->NID_2)
-                                <img src="{{ asset($user->NID_2) }}" class="img-thumbnail mt-2" width="250">
+                                <img src="{{ asset('storage/'.$user->NID_2) }}" class="img-thumbnail mt-2" width="250">
                             @endif
                         </div>
                         <button class="btn btn-success"><i class="fas fa-check me-1"></i> Verify</button>

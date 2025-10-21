@@ -47,7 +47,7 @@
                                 <tr><th>Gender</th><td>{{ $user->gender }}</td></tr>
                                 <tr>
                                     <th>Profile Picture</th>
-                                    <td><img src="{{ asset($user->profile_pic ?? 'default.png') }}" width="120" class="img-thumbnail"></td>
+                                    <td><img src="{{ asset('storage/'.$user->profile_pic ?? 'default.png') }}" width="120" class="img-thumbnail"></td>
                                 </tr>
                                 <tr><th>Created At</th><td>{{ $user->created_at }}</td></tr>
                                 <tr>
@@ -118,7 +118,7 @@
                                 <div class="col-md-12">
                                     <label class="form-label">Profile Image</label>
                                     <input type="file" name="profile_image" class="form-control">
-                                    <img src="{{ asset($user->profile_pic ?? 'default.png') }}" class="mt-2 img-thumbnail" width="120">
+                                    <img src="{{ asset('storage/'.$user->profile_pic ?? 'default.png') }}" class="mt-2 img-thumbnail" width="120">
                                 </div>
                             </div>
 
@@ -141,7 +141,7 @@
                                 <label class="form-label">NID Front</label>
                                 <input type="file" name="nid_image" class="form-control" required>
                                 @if($user->NID_1)
-                                    <img src="{{ asset($user->NID_1) }}" class="img-thumbnail mt-2" width="250">
+                                    <img src="{{ asset(path: 'storage/'.$user->NID_1) }}" class="img-thumbnail mt-2" width="250">
                                 @endif
                             </div>
 
@@ -149,7 +149,7 @@
                                 <label class="form-label">NID Back</label>
                                 <input type="file" name="nid_image2" class="form-control" required>
                                 @if($user->NID_2)
-                                    <img src="{{ asset($user->NID_2) }}" class="img-thumbnail mt-2" width="250">
+                                    <img src="{{ asset('storage/'.$user->NID_2) }}" class="img-thumbnail mt-2" width="250">
                                 @endif
                             </div>
 

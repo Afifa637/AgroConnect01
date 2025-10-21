@@ -14,7 +14,7 @@ class FarmCropController extends Controller
     {
         view()->composer('farmer.*', function ($view) {
             $username = Session::get('f_username');
-            $user = Farmer_register::where('username', $username)->first();
+            $user = farmer_register::where('username', $username)->first();
             $view->with('user', $user);
         });
     }

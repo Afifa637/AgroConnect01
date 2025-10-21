@@ -6,6 +6,37 @@
 <div class="py-5">
     <h3 class="text-success text-center">{{ Session::get('f_login') }}</h3>
 
+    
+{{-- Flash Message --}}
+@if (session('login_success') || session('reg_success') || session('msg') || session('l_msg') || session('login_error')|| session('success'))
+<div class="container mt-3">
+    @if (session('login_success'))
+        <div class="alert alert-success text-center">{{ session('login_success') }}</div>
+    @endif
+    @if (session('reg_success'))
+        <div class="alert alert-success text-center">{{ session('reg_success') }}</div>
+    @endif
+    @if (session('msg'))
+        <div class="alert alert-info text-center">{{ session('msg') }}</div>
+    @endif
+    @if (session('l_msg'))
+        <div class="alert alert-warning text-center">{{ session('l_msg') }}</div>
+    @endif
+    @if (session('login_error'))
+        <div class="alert alert-danger text-center">{{ session('login_error') }}</div>
+    @endif
+    @if (session('success'))
+<div class="alert alert-success text-center">{{ session('success') }}</div>
+@endif
+</div>
+@endif
+
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+}, 4000);
+</script>
+
     <!-- Static cards -->
     <div class="row g-4 mb-5">
         <div class="col-lg-4 col-md-6">
